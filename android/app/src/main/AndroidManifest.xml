@@ -7,6 +7,9 @@
         android:label="network_quality_statistic"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <meta-data android:name="com.mapbox.token" android:value="sk.eyJ1IjoiaGlldW5tMTIxMiIsImEiOiJjbGxpdWZxbGUwa2xlM2pxdWt5dXBiaHpoIn0.V-v43bc4XXDm7dI5lNkGew"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

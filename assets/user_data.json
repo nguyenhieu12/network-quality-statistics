@@ -1,0 +1,32 @@
+[
+    {
+        "id": 0,
+        "email": "toanquoc@gmail.com",
+        "password": "toanquoc",
+        "fullName": "Toan Quoc",
+        "phoneNumber": "0123456789",
+        "role": "all",
+        "province": "all",
+        "imageUrl": "https://cdn4.iconfinder.com/data/icons/avatars-21/512/avatar-circle-human-male-2-512.png"
+    },
+    {
+        "id": 1,
+        "email": "khuvuc@gmail.com",
+        "password": "khuvuc",
+        "fullName": "Khu Vuc",
+        "phoneNumber": "0123456789",
+        "role": "area",
+        "province": "Mien Bac",
+        "imageUrl": "https://cdn4.iconfinder.com/data/icons/avatars-21/512/avatar-circle-human-male-2-512.png"
+    },
+    {
+        "id": 2,
+        "email": "tinhthanh@gmail.com",
+        "password": "tinhthanh",
+        "fullName": "Tinh Thanh",
+        "phoneNumber": "0123456789",
+        "role": "province",
+        "province": "Ha Noi",
+        "imageUrl": "https://cdn4.iconfinder.com/data/icons/avatars-21/512/avatar-circle-human-male-2-512.png"
+    }
+]
