@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:network_quality_statistic/presentation/screens/login_screen.dart';
-import 'package:sqflite/sqflite.dart';
 import 'data/repositories/user_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  deleteDatabase('path');
 
   final userRepository = UserRepository();
   await userRepository.insertUsersFromJsonFile('assets/user_data.json');

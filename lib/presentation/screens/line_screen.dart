@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
+
+import '../widgets/statistic_widget.dart';
 
 class LineScreen extends StatefulWidget {
   const LineScreen({super.key});
@@ -10,23 +13,41 @@ class LineScreen extends StatefulWidget {
 
 class _LineScreenState extends State<LineScreen> {
   late MapboxMapController mapController;
-  // List<String> _suggestions = [
-  //   'Apple',
-  //   'Banana',
-  //   'Cherry',
-  //   'Date',
-  //   'Fig',
-  //   'Grape',
-  //   'Kiwi',
-  //   'Lemon',
-  //   'Mango',
-  //   'Orange',
-  //   'Peach',
-  //   'Pear',
-  //   'Pineapple',
-  //   'Strawberry',
-  //   'Watermelon',
-  // ];
+  TextEditingController searchController = TextEditingController();
+  List<String> suggestions = [
+    'Apple',
+    'Banana',
+    'Cherry',
+    'Date',
+    'Fig',
+    'Grape',
+    'Kiwi',
+    'Lemon',
+    'Mango',
+    'Orange',
+    'Peach',
+    'Pear',
+    'Pineapple',
+    'Strawberry',
+    'Watermelon',
+  ];
+
+  List<String> filteredSuggestions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    searchController.addListener(filterSuggestions);
+  }
+
+  void filterSuggestions() {
+    final searchText = searchController.text.toLowerCase();
+    setState(() {
+      filteredSuggestions = suggestions
+          .where((suggestion) => suggestion.toLowerCase().contains(searchText))
+          .toList();
+    });
+  }
 
   void _onMapCreated(MapboxMapController controller) {
     mapController = controller;
@@ -38,143 +59,110 @@ class _LineScreenState extends State<LineScreen> {
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      body: Container(
-        color: Colors.white,
-        child: Column(
-          children: [
-            SizedBox(height: screenHeight * 0.15),
-            Row(
-              children: [
-                // DropdownButton(items: items, onChanged: onChanged)
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                    color: Color.fromARGB(255, 78, 198, 35),
-                  ),
-                  width: screenWidth * 0.3,
-                  height: screenHeight * 0.15,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text(
-                        'Tốt',
-                        style: TextStyle(
-                            fontSize: screenWidth * 0.048,
-                            color: Colors.white,
-                            decoration: TextDecoration.none),
+      resizeToAvoidBottomInset: false,
+      body: SingleChildScrollView(
+        physics: NeverScrollableScrollPhysics(),
+        child: Container(
+          color: Colors.white,
+          child: Column(
+            children: [
+              SizedBox(height: screenHeight * 0.08),
+              SizedBox(
+                  width: screenWidth * 0.95,
+                  height: screenHeight * 0.05,
+                  child: TextFormField(
+                    style: TextStyle(
+                      fontSize: 24,
+                      color: Colors.black,
+                      decoration: TextDecoration.none,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      border: InputBorder
+                          .none, // Đây là phần quan trọng để xóa gạch ngang
+                      labelText: 'Tìm kiếm',
+                      labelStyle: const TextStyle(
+                        fontSize: 20,
+                        color: Color.fromARGB(255, 108, 108, 108),
                       ),
-                      Text(
-                        '0',
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            decoration: TextDecoration.none),
+                      prefixIcon: Icon(
+                        Icons.search_outlined,
+                        size: 28,
+                        color: Colors.black,
                       ),
-                      Text(
-                        '0%',
-                        style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            decoration: TextDecoration.none),
-                      )
-                    ],
-                  ),
-                ),
-                Container(
-                  width: screenWidth * 0.3,
-                  height: screenHeight * 0.15,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                    color: Color.fromARGB(255, 255, 153, 0),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Center(
-                        child: Text(
-                          'Trung bình',
-                          style: TextStyle(
-                              fontSize: screenWidth * 0.048,
-                              color: Colors.white,
-                              decoration: TextDecoration.none),
-                        ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide(color: Colors.black, width: 1.0),
                       ),
-                      Text(
-                        '0',
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            decoration: TextDecoration.none),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide(color: Colors.black, width: 1.0),
                       ),
-                      Text(
-                        '0%',
-                        style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            decoration: TextDecoration.none),
-                      )
-                    ],
-                  ),
-                ),
-                Container(
-                  width: screenWidth * 0.3,
-                  height: screenHeight * 0.15,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                    color: Color.fromARGB(255, 255, 80, 80),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text(
-                        'Tồi',
-                        style: TextStyle(
-                            fontSize: screenWidth * 0.048,
-                            color: Colors.white,
-                            decoration: TextDecoration.none),
-                      ),
-                      Text(
-                        '0',
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            decoration: TextDecoration.none),
-                      ),
-                      Text(
-                        '0%',
-                        style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            decoration: TextDecoration.none),
-                      )
-                    ],
-                  ),
-                )
-              ],
-            ),
-            Container(
-              child: Divider(
-                thickness: 0.6,
+                      contentPadding: EdgeInsets.only(left: 16, bottom: 100),
+                      floatingLabelBehavior: FloatingLabelBehavior.never,
+                    ),
+                  )),
+              SizedBox(height: 15),
+              // SizedBox(
+              //   width: screenWidth * 0.95,
+              //   height: screenHeight * 0.05,
+              //   child: ListView.builder(
+              //     itemCount: filteredSuggestions.length,
+              //     itemBuilder: (context, index) {
+              //       return ListTile(
+              //         title: Text(filteredSuggestions[index]),
+              //         onTap: () {
+              //           searchController.text = filteredSuggestions[index];
+              //         },
+              //       );
+              //     },
+              //   ),
+              // ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  StatisticWidget(
+                      label: 'Tốt',
+                      statistic: '',
+                      percent: '',
+                      color: Color.fromARGB(255, 67, 217, 13),
+                      screenWidth: screenWidth,
+                      screenHeight: screenHeight),
+                  StatisticWidget(
+                      label: 'Trung bình',
+                      statistic: '',
+                      percent: '',
+                      color: Color.fromARGB(255, 255, 153, 0),
+                      screenWidth: screenWidth,
+                      screenHeight: screenHeight),
+                  StatisticWidget(
+                      label: 'Tồi',
+                      statistic: '',
+                      percent: '',
+                      color: Color.fromARGB(255, 255, 80, 80),
+                      screenWidth: screenWidth,
+                      screenHeight: screenHeight)
+                ],
               ),
-            ),
-            Container(
-              height: screenHeight * 0.6,
-              child: MapboxMap(
-                accessToken:
-                    'sk.eyJ1IjoiaGlldW5tMTIxMiIsImEiOiJjbGptanBtMmExNmhjM3FrMjE1bHZpdzVmIn0.TwqdH0eYn4xy34qcyFWgkQ',
-                styleString:
-                    'mapbox://styles/hieunm1212/clkq6rt3s00cb01ph7e3z6dtx',
-                initialCameraPosition: const CameraPosition(
-                    target: LatLng(21.028511, 105.804817), zoom: 2.0),
-                onMapCreated: _onMapCreated,
+              Container(
+                child: Divider(
+                  thickness: 0.6,
+                ),
               ),
-            ),
-          ],
+              Container(
+                height: screenHeight * 0.62,
+                child: MapboxMap(
+                  accessToken:
+                      'sk.eyJ1IjoiaGlldW5tMTIxMiIsImEiOiJjbGptanBtMmExNmhjM3FrMjE1bHZpdzVmIn0.TwqdH0eYn4xy34qcyFWgkQ',
+                  styleString: MapboxStyles.MAPBOX_STREETS,
+                  initialCameraPosition: const CameraPosition(
+                      target: LatLng(21.028511, 105.804817), zoom: 12.0),
+                  onMapCreated: _onMapCreated,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

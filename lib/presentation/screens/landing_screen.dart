@@ -7,7 +7,16 @@ import 'package:network_quality_statistic/presentation/screens/setting_screen.da
 import '../../logic/blocs/landing/landing_bloc.dart';
 
 class LandingScreen extends StatefulWidget {
-  const LandingScreen({super.key});
+  String fullName;
+  String email;
+  String phoneNumber;
+  String imageUrl;
+
+  LandingScreen(
+      {required this.fullName,
+      required this.email,
+      required this.phoneNumber,
+      required this.imageUrl});
 
   @override
   State<LandingScreen> createState() => _LandingScreenState();
@@ -15,8 +24,6 @@ class LandingScreen extends StatefulWidget {
 
 class _LandingScreenState extends State<LandingScreen> {
   final LandingBloc landingBloc = LandingBloc();
-
-  List<Widget> screenList = [DashboardScreen(), LineScreen(), SettingScreen()];
 
   List<BottomNavigationBarItem> bottomNavItems = [
     BottomNavigationBarItem(
@@ -42,6 +49,16 @@ class _LandingScreenState extends State<LandingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> screenList = [
+      DashboardScreen(),
+      LineScreen(),
+      SettingScreen(
+          fullName: widget.fullName,
+          email: widget.email,
+          phoneNumber: widget.phoneNumber,
+          imageUrl: widget.imageUrl)
+    ];
+
     return BlocConsumer<LandingBloc, LandingState>(
       bloc: landingBloc,
       listenWhen: (previous, current) => current is LandingActionState,

@@ -6,7 +6,7 @@ class DatabaseHepler {
       CREATE TABLE users (
         id INTEGER PRIMARY KEY,
         email TEXT,
-        password TEXT,F
+        password TEXT,
         fullName TEXT,
         phoneNumber TEXT,
         role TEXT,

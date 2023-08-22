@@ -11,7 +11,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../logic/blocs/setting/setting_bloc.dart';
 
 class SettingScreen extends StatefulWidget {
-  const SettingScreen({super.key});
+  String fullName;
+  String email;
+  String phoneNumber;
+  String imageUrl;
+
+  SettingScreen(
+      {required this.fullName,
+      required this.email,
+      required this.phoneNumber,
+      required this.imageUrl});
 
   @override
   State<SettingScreen> createState() => _SettingScreenState();
@@ -20,19 +29,6 @@ class SettingScreen extends StatefulWidget {
 class _SettingScreenState extends State<SettingScreen> {
   bool isTurnOn = false;
   final SettingBloc settingBloc = SettingBloc();
-
-  // late SharedPreferences _prefs;
-
-  // Future<String?> getFullName() async {
-  //   _prefs = await SharedPreferences.getInstance();
-  //   return await _prefs.getString('fullName');
-  // }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _initSharedPreferences();
-  // }
 
   PageRouteBuilder changePage(Widget page) {
     return PageRouteBuilder(
@@ -81,7 +77,14 @@ class _SettingScreenState extends State<SettingScreen> {
                     phoneNumber: currentState.phoneNumber,
                     imageUrl: currentState.imageUrl)));
           case NavigateToUpdateAccountState:
-            Navigator.push(context, changePage(UpdateAccountScreen()));
+            Navigator.push(
+                context,
+                changePage(UpdateAccountScreen(
+                  fullName: widget.fullName,
+                  email: widget.email,
+                  phoneNumber: widget.phoneNumber,
+                  imageUrl: widget.imageUrl,
+                )));
           case LogoutSuccessState:
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => LoginScreen()));
@@ -116,7 +119,6 @@ class _SettingScreenState extends State<SettingScreen> {
                       color: Colors.transparent,
                       child: GestureDetector(
                         onTap: () async {
-                          debugPrint('HHHHHHH');
                           SharedPreferences prefs =
                               await SharedPreferences.getInstance();
                           settingBloc.add(AccountInfoClickedEvent(
@@ -129,13 +131,12 @@ class _SettingScreenState extends State<SettingScreen> {
                           children: [
                             CircleAvatar(
                               radius: 55.0,
-                              backgroundImage: NetworkImage(
-                                  'https://mirror-media.imgix.net/publication-images/_Cw2xE5CuyrQvxgsrisDb.png?h=800&w=1200'),
+                              backgroundImage: NetworkImage(widget.imageUrl),
                               backgroundColor: Colors.transparent,
                             ),
                             SizedBox(width: 20),
                             Text(
-                              'ABC',
+                              widget.fullName,
                               style: TextStyle(fontSize: 22),
                             ),
                             Spacer(),

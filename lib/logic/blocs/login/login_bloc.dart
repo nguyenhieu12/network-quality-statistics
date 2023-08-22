@@ -31,7 +31,11 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       prefs.setString('role', loginUser['role']);
       prefs.setString('province', loginUser['province']);
       prefs.setString('imageUrl', loginUser['imageUrl']);
-      emit(LoginSuccessState());
+      emit(LoginSuccessState(
+          fullName: loginUser['fullName'],
+          email: loginUser['email'],
+          phoneNumber: loginUser['phoneNumber'],
+          imageUrl: loginUser['imageUrl']));
       debugPrint('SUCCESS!!!');
       debugPrint("USER: ${loginUser.toString()}");
     } else {

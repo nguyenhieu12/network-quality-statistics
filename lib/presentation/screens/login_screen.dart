@@ -30,8 +30,11 @@ class _LoginScreenState extends State<LoginScreen> {
       buildWhen: (previous, current) => current is! LoginActionState,
       listener: (context, state) {
         if (state is LoginSuccessState) {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => LandingScreen()));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => LandingScreen(
+                      fullName: state.fullName, email: state.email, phoneNumber: state.phoneNumber, imageUrl: state.imageUrl)));
           debugPrint('Email: ${emailController.text}');
           debugPrint('Email: ${passwordController.text}');
         } else if (state is ShowLoginFailedState) {
@@ -174,7 +177,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ElevatedButton(
                       onPressed: () {
                         loginBloc.add(LoginButtonClickedEvent(
-                            email: 'toanquoc@gmail.com', password: 'toanquoc'));
+                            email: 'toanquoc@gmail.com',
+                            password: 'toanquoc'));
                         FocusScope.of(context).unfocus();
                       },
                       child: Text(

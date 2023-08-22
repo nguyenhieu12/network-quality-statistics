@@ -26,18 +26,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
   late bool isAll;
   String currentArea = '';
   String currentProvince = '';
+  String selectedOption = 'Toàn quốc';
 
   void _onMapCreated(MapboxMapController controller) {
     mapController = controller;
+
+    if (lowGeoJson.isNotEmpty) {
+      removeAllLayers();
+    }
+
     initMapAll();
+
+    mapController.onFeatureTapped.add((id, point, coordinates) {
+      handleProvinceTapped(id);
+    });
   }
 
   final List<String> listOptions = [
     'Toàn quốc',
     'Miền Bắc',
     'Miền Trung',
-    'Miền Nam',
-    'Phú Thọ'
+    'Miền Nam'
   ];
 
   final List<int> lowOptions = [20, 30, 40, 50];
@@ -71,6 +80,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         for (var item in geoJsonData['features']) item['id']: item
       };
 
+      for (int i = 0; i < provinceData.length; i++) {
+        if (i == 0) {
+          debugPrint('TEST: ${provinceData[i]}');
+        }
+      }
+
       for (int i = 0; i < features.length; i++) {
         debugPrint('HEHE: ${features[i]['kqi'].runtimeType}');
       }
@@ -100,11 +115,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         "features": highGeoJson,
       };
 
-      addLayer('sourceId-low', 'layerId-low', lowFeatureCollection, 'red');
+      addLayer('sourceId-low', 'layerId-low', lowFeatureCollection, '#FF4A4A');
       addLayer('sourceId-medium', 'layerId-medium', mediumFeatureCollection,
-          'orange');
+          '#FF9533');
       addLayer(
-          'sourceId-high', 'layerId-high', highFeatureCollection, 'lightgreen');
+          'sourceId-high', 'layerId-high', highFeatureCollection, '#6FE844');
 
       isAll = true;
 
@@ -114,23 +129,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  Future<void> initMapArea(String area) async {
+  Future<void> initMapArea(String selectedArea) async {
     String area = await rootBundle.loadString('assets/province_domain.json');
     Map<String, dynamic> areaData = json.decode(area);
-    List<dynamic> areaName = [];
+    List<dynamic> provincesName = areaData[selectedArea];
 
-    if (area == 'Miền Bắc') {
-      areaName = areaData['Miền Bắc'];
-    } else if (area == 'Miền Nam') {
-      areaName = areaData['Miền Nam'];
-    } else {
-      areaName = areaData['Miền Trung'];
-    }
+    debugPrint('HUHU: $provincesName');
     List<dynamic> features = geoJsonData['features'];
 
-    for (int i = 0; i < areaName.length; i++) {
+    for (int i = 0; i < provincesName.length; i++) {
       for (int j = 0; j < features.length; j++) {
-        if (areaName[i] == features[j]['properties']['Name_VI']) {
+        if (provincesName[i] == features[j]['properties']['Name_VI']) {
           if (features[j]['kqi'] < lowThreshold) {
             lowGeoJson.add(features[j]);
           } else if (features[j]['kqi'] > highThreshold) {
@@ -142,33 +151,47 @@ class _DashboardScreenState extends State<DashboardScreen> {
       }
     }
 
-    Map<String, dynamic> lowFeatureCollection = {
-      "type": "FeatureCollection",
-      "features": lowGeoJson,
-    };
+    if (lowGeoJson.isNotEmpty) {
+      Map<String, dynamic> lowFeatureCollection = {
+        "type": "FeatureCollection",
+        "features": lowGeoJson,
+      };
 
-    Map<String, dynamic> mediumFeatureCollection = {
-      "type": "FeatureCollection",
-      "features": mediumGeoJson,
-    };
+      addLayer('sourceId-low-$selectedArea', 'layerId-low-$selectedArea',
+          lowFeatureCollection, '#FF4A4A');
+    }
 
-    Map<String, dynamic> highFeatureCollection = {
-      "type": "FeatureCollection",
-      "features": highGeoJson,
-    };
+    if (mediumGeoJson.isNotEmpty) {
+      Map<String, dynamic> mediumFeatureCollection = {
+        "type": "FeatureCollection",
+        "features": mediumGeoJson,
+      };
 
-    addLayer(
-        'sourceId-low-$area', 'layerId-low-$area', lowFeatureCollection, 'red');
-    addLayer('sourceId-medium-$area', 'layerId-medium-$area',
-        mediumFeatureCollection, 'orange');
-    addLayer('sourceId-high-$area', 'layerId-high-$area', highFeatureCollection,
-        'lightgreen');
+      addLayer('sourceId-medium-$selectedArea', 'layerId-medium-$selectedArea',
+          mediumFeatureCollection, '#FF9533');
+    }
+
+    if (highGeoJson.isNotEmpty) {
+      Map<String, dynamic> highFeatureCollection = {
+        "type": "FeatureCollection",
+        "features": highGeoJson,
+      };
+
+      addLayer('sourceId-high-$selectedArea', 'layerId-high-$selectedArea',
+          highFeatureCollection, '#6FE844');
+    }
+
+    selectedArea == 'Miền Bắc'
+        ? await mapController.moveCamera(
+            CameraUpdate.newLatLngZoom(LatLng(21.520133, 105.080089), 5.6))
+        : (selectedArea == 'Miền Trung'
+            ? await mapController.moveCamera(
+                CameraUpdate.newLatLngZoom(LatLng(15.386838, 106.578776), 5.15))
+            : await mapController.moveCamera(CameraUpdate.newLatLngZoom(
+                LatLng(10.079575, 106.0102799), 6.35)));
   }
 
   Future<void> initMapProvince(String province) async {
-    // String area = await rootBundle.loadString('assets/vietnam_province.geojson');
-    // Map<String, dynamic> areaData = json.decode(area);
-    // List<String> areaName = areaData[area];
     List<dynamic> features = geoJsonData['features'];
 
     for (int i = 0; i < features.length; i++) {
@@ -190,7 +213,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       };
 
       addLayer('sourceId-$province', 'layerId-$province', lowFeatureCollection,
-          'red');
+          '#FF6666');
     } else if (mediumGeoJson.isNotEmpty) {
       Map<String, dynamic> mediumFeatureCollection = {
         "type": "FeatureCollection",
@@ -198,7 +221,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       };
 
       addLayer('sourceId-$province', 'layerId-$province',
-          mediumFeatureCollection, 'orange');
+          mediumFeatureCollection, '#FF9900');
     } else {
       Map<String, dynamic> highFeatureCollection = {
         "type": "FeatureCollection",
@@ -206,7 +229,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       };
 
       addLayer('sourceId-$province', 'layerId-$province', highFeatureCollection,
-          'lightgreen');
+          '#E4C623');
     }
   }
 
@@ -216,26 +239,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
     highGeoJson.clear();
 
     await mapController.removeLayer('layerId-low');
-    await mapController.removeLayer('layerId-medium');
-    await mapController.removeLayer('layerId-high');
-
     await mapController.removeSource('sourceId-low');
+
+    await mapController.removeLayer('layerId-medium');
     await mapController.removeSource('sourceId-medium');
+
+    await mapController.removeLayer('layerId-high');
     await mapController.removeSource('sourceId-high');
   }
 
-  Future<void> removeAreaLayer(String area) async {
+  Future<void> removeAreaLayer(String selectedArea) async {
     lowGeoJson.clear();
     mediumGeoJson.clear();
     highGeoJson.clear();
 
-    await mapController.removeLayer('layerId-low-$area');
-    await mapController.removeLayer('layerId-medium-$area');
-    await mapController.removeLayer('layerId-high-$area');
+    await mapController.removeLayer('layerId-low-$selectedArea');
+    await mapController.removeSource('sourceId-low-$selectedArea');
 
-    await mapController.removeSource('sourceId-low-$area');
-    await mapController.removeSource('sourceId-medium-$area');
-    await mapController.removeSource('sourceId-high-$area');
+    await mapController.removeLayer('layerId-medium-$selectedArea');
+    await mapController.removeSource('sourceId-medium-$selectedArea');
+
+    await mapController.removeLayer('layerId-high-$selectedArea');
+    await mapController.removeSource('sourceId-high-$selectedArea');
+
+    debugPrint('AREA: $selectedArea DELETED');
   }
 
   Future<void> removeProvinceLayer(String province) async {
@@ -259,7 +286,310 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ));
   }
 
-  String selectedOption = 'Toàn quốc';
+  Future<void> handleOptionSelected(String newValue) async {
+    if (newValue.contains('Miền')) {
+      if (currentArea == '') {
+        currentArea = newValue;
+        selectedOption = newValue;
+        isAll = false;
+        await removeAllLayers();
+        await initMapArea(newValue);
+        setState(() {});
+      } else if (currentArea == newValue) {
+        return;
+      } else {
+        await removeAreaLayer(currentArea);
+        await initMapArea(newValue);
+        currentArea = newValue;
+        selectedOption = newValue;
+        setState(() {});
+      }
+    } else if (newValue == 'Toàn quốc') {
+      if (currentArea != '') {
+        await removeAreaLayer(currentArea);
+        await initMapAll();
+        currentArea = '';
+        selectedOption = newValue;
+        await mapController.moveCamera(
+            CameraUpdate.newLatLngZoom(LatLng(16.102622, 105.690185), 4.6));
+        setState(() {});
+      }
+    }
+  }
+
+  void handleProvinceTapped(dynamic id) {
+    showModalBottomSheet(
+      context: context,
+      builder: ((context) {
+        return Container(
+          height: 350,
+          width: double.infinity,
+          decoration: BoxDecoration(
+              color: Colors.white, borderRadius: BorderRadius.circular(20)),
+          child: Stack(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: 10, left: 10),
+                child: IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(
+                      Icons.clear,
+                      size: 30,
+                      color: Colors.black,
+                    )),
+              ),
+              Center(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(top: 10),
+                        child: Text(
+                          'Thông tin tỉnh/thành phố',
+                          style: TextStyle(fontSize: 24),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 60, right: 60),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Tỉnh/thành phố:',
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                            Text(
+                              '${provinceData[id]['properties']['Name_VI']}',
+                              style: const TextStyle(fontSize: 18),
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 60, right: 60),
+                        child: Container(
+                          child: Divider(
+                            thickness: 0.8,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 60, right: 60),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Ngưỡng mạng:',
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                            Text(
+                              '$lowThreshold - $highThreshold',
+                              style: const TextStyle(fontSize: 18),
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 60, right: 60),
+                        child: Container(
+                          child: Divider(
+                            thickness: 0.8,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 60, right: 60),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Giá trị:',
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                            Text(
+                              '${provinceData[id]['kqi']}',
+                              style: const TextStyle(fontSize: 18),
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 60, right: 60),
+                        child: Container(
+                          child: Divider(
+                            thickness: 0.8,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 60, right: 60),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Chất lượng:',
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                            Text(
+                              '${(provinceData[id]['kqi'] < lowThreshold ? 'Tồi' : (provinceData[id]['kqi'] > highThreshold ? 'Tốt' : 'Trung bình'))}',
+                              style: const TextStyle(fontSize: 18),
+                            )
+                          ],
+                        ),
+                      ),
+                    ]),
+              ),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+
+  void _showBottomSheet(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    showModalBottomSheet(
+      context: context,
+      builder: ((context) {
+        return Container(
+          height: 250,
+          width: double.infinity,
+          decoration: BoxDecoration(
+              color: Colors.white, borderRadius: BorderRadius.circular(20)),
+          child: Stack(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: 40, left: 10),
+                child: IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(
+                      Icons.clear,
+                      size: 28,
+                      color: Colors.black,
+                    )),
+              ),
+              Center(
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                    Padding(
+                      padding: EdgeInsets.only(top: 30),
+                      child: Text(
+                        'Chọn phạm vi',
+                        style: TextStyle(fontSize: 24),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            await handleOptionSelected('Toàn quốc');
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            width: screenWidth * 0.4,
+                            height: screenHeight * 0.04,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20)),
+                              border: Border.all(color: Colors.black),
+                              color: Colors.white,
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Toàn quốc',
+                                style: TextStyle(fontSize: 20),
+                              ),
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () async {
+                            await handleOptionSelected('Miền Bắc');
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            width: screenWidth * 0.4,
+                            height: screenHeight * 0.04,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20)),
+                              border: Border.all(color: Colors.black),
+                              color: Colors.white,
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Miền Bắc',
+                                style: TextStyle(fontSize: 20),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            await handleOptionSelected('Miền Trung');
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            width: screenWidth * 0.4,
+                            height: screenHeight * 0.04,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20)),
+                              border: Border.all(color: Colors.black),
+                              color: Colors.white,
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Miền Trung',
+                                style: TextStyle(fontSize: 20),
+                              ),
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () async {
+                            await handleOptionSelected('Miền Nam');
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            width: screenWidth * 0.4,
+                            height: screenHeight * 0.04,
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20)),
+                              border: Border.all(color: Colors.black),
+                              color: Colors.white,
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Miền Nam',
+                                style: TextStyle(fontSize: 20),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    )
+                  ])),
+            ],
+          ),
+        );
+      }),
+    );
+  }
 
   void showThresholdOptions(double screenWidth, double screenHeight) {
     showModalBottomSheet(
@@ -336,14 +666,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 );
                               }).toList(),
                               decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  borderSide: BorderSide(color: Colors.black),
-                                ),
+                                enabledBorder: UnderlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.transparent)),
                                 focusedBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20)),
-                                  borderSide: BorderSide(color: Colors.black),
+                                  borderSide:
+                                      BorderSide(color: Colors.transparent),
                                 ),
                                 contentPadding: EdgeInsets.symmetric(
                                     horizontal: screenWidth * 0.05),
@@ -351,7 +679,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               borderRadius: BorderRadius.circular(20),
                               menuMaxHeight: screenHeight * 0.3,
                               style:
-                                  TextStyle(color: Colors.black, fontSize: 18),
+                                  TextStyle(color: Colors.black, fontSize: 20),
                               dropdownColor: Colors.white,
                               iconSize: 40.0,
                             ),
@@ -394,14 +722,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 );
                               }).toList(),
                               decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  borderSide: BorderSide(color: Colors.black),
-                                ),
+                                enabledBorder: UnderlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.transparent)),
                                 focusedBorder: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20)),
-                                  borderSide: BorderSide(color: Colors.black),
+                                  borderSide:
+                                      BorderSide(color: Colors.transparent),
                                 ),
                                 contentPadding: EdgeInsets.symmetric(
                                     horizontal: screenWidth * 0.05),
@@ -409,7 +735,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               borderRadius: BorderRadius.circular(20),
                               menuMaxHeight: screenHeight * 0.3,
                               style:
-                                  TextStyle(color: Colors.black, fontSize: 18),
+                                  TextStyle(color: Colors.black, fontSize: 20),
                               dropdownColor: Colors.white,
                               iconSize: 40.0,
                             ),
@@ -421,22 +747,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         width: screenWidth * 0.4,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                              side: BorderSide(),
+                              side: BorderSide(color: Colors.red),
                               backgroundColor: Colors.white),
                           onPressed: () async {
                             if (isAll) {
                               await removeAllLayers();
                               await initMapAll();
                               Navigator.pop(context);
+                            } else if (currentArea != '') {
+                              await removeAreaLayer(currentArea);
+                              await initMapArea(currentArea);
+                              Navigator.pop(context);
                             }
                             setState(() {});
-                            // mapController.moveCamera(CameraUpdate.newLatLngZoom(LatLng(20.920133, 105.480089), 6.5));
                           },
                           child: Center(
                             child: Text(
                               'Áp dụng',
                               style: TextStyle(
-                                  color: Colors.black,
+                                  color: Colors.red,
                                   fontSize: 20,
                                   fontWeight: FontWeight.w400),
                             ),
@@ -472,60 +801,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Row(
                   children: [
                     Container(
-                      constraints: BoxConstraints(maxWidth: screenWidth * 0.46),
                       width: screenWidth * 0.46,
-                      height: screenHeight * 0.04,
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.black,
-                          ),
-                          borderRadius: BorderRadius.circular(20)),
-                      child: DropdownButtonFormField<String>(
-                        value: selectedOption,
-                        onChanged: (newValue) {
-                          if (newValue!.contains('Miền')) {
-                            if (currentArea == newValue) {
-                              return;
-                            } else if (currentProvince != '') {
-                              currentProvince = '';
-                              removeProvinceLayer(currentProvince);
-                              initMapArea(newValue);
-                            } else if (isAll) {
-                              isAll = false;
-                              removeAllLayers();
-                              initMapArea(newValue);
-                            }
-                            selectedOption = newValue;
-                            setState(() {});
-                          } else if(newValue == 'Toàn quốc') {
-
-                          }
-                        },
-                        items: listOptions
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            alignment: AlignmentDirectional.center,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                            borderSide: BorderSide(color: Colors.black),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(20)),
-                            borderSide: BorderSide(color: Colors.black),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: screenWidth * 0.05),
+                      height: screenHeight * 0.042,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          side: BorderSide(color: Colors.black, width: 1.5),
                         ),
-                        borderRadius: BorderRadius.circular(20),
-                        menuMaxHeight: screenHeight * 0.3,
-                        style: TextStyle(color: Colors.black, fontSize: 16),
-                        dropdownColor: Colors.white,
-                        iconSize: 36.0,
+                        onPressed: () {
+                          _showBottomSheet(context);
+                          // showThresholdOptions(screenWidth, screenHeight);
+                        },
+                        icon: Icon(
+                          Icons.border_all_rounded,
+                          size: 22,
+                          color: Colors.black,
+                        ),
+                        label: Text(
+                          'Phạm vi',
+                          style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.black,
+                              fontWeight: FontWeight.normal),
+                        ),
                       ),
                     ),
                     Spacer(),
@@ -570,7 +868,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ((highGeoJson.length) / (provincesValue.length) * 100)
                                   .toStringAsFixed(2) +
                               '%',
-                      color: Color.fromARGB(255, 78, 198, 35),
+                      color: Color.fromARGB(255, 67, 217, 13),
                       screenWidth: screenWidth,
                       screenHeight: screenHeight),
                   StatisticWidget(
@@ -614,7 +912,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   styleString:
                       'mapbox://styles/hieunm1212/clkq6rt3s00cb01ph7e3z6dtx',
                   initialCameraPosition: const CameraPosition(
-                      target: LatLng(16.102622, 105.690185), zoom: 4.6),
+                      target: LatLng(15.702622, 105.690185), zoom: 4.6),
                   onMapCreated: _onMapCreated,
                 ),
               ),
