@@ -1,13 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:network_quality_statistic/data/repositories/user_repository.dart';
 
 class UpdateAccountScreen extends StatefulWidget {
+  int id;
   String fullName;
   String email;
   String phoneNumber;
   String imageUrl;
 
   UpdateAccountScreen(
-      {required this.fullName,
+      {required this.id,
+      required this.fullName,
       required this.email,
       required this.phoneNumber,
       required this.imageUrl});
@@ -17,6 +23,26 @@ class UpdateAccountScreen extends StatefulWidget {
 }
 
 class _UpdateAccountScreenState extends State<UpdateAccountScreen> {
+  XFile? image;
+  bool isImageSelected = false;
+  String newImageUrl = '';
+
+  Future getImageFromGallery() async {
+    final XFile? pickedImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedImage == null) {
+      return;
+    }
+
+    String newImagePath = pickedImage.path;
+
+    await UserRepository.updateUser(widget.id, newImagePath, '0123456789');
+
+    setState(() {
+      newImageUrl = newImagePath;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -70,16 +96,18 @@ class _UpdateAccountScreenState extends State<UpdateAccountScreen> {
                     ),
                     SizedBox(height: 30),
                     ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        getImageFromGallery();
+                      },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        side: BorderSide(color: Colors.black, width: 1),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25.0),
-                        ),
-                        maximumSize:
-                            Size(screenWidth * 0.4, screenHeight * 0.05),
-                      ),
+                          backgroundColor: Colors.white,
+                          side: BorderSide(color: Colors.black, width: 1),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25.0),
+                          ),
+                          maximumSize:
+                              Size(screenWidth * 0.4, screenHeight * 0.05),
+                          onPrimary: Color.fromARGB(255, 255, 177, 177)),
                       child: Row(
                         children: [
                           Icon(Icons.switch_account_sharp, color: Colors.black),
@@ -169,14 +197,14 @@ class _UpdateAccountScreenState extends State<UpdateAccountScreen> {
                     ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 255, 102, 102),
-                        side: BorderSide(color: Colors.transparent, width: 1),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25.0),
-                        ),
-                        maximumSize:
-                            Size(screenWidth * 0.5, screenHeight * 0.05),
-                      ),
+                          backgroundColor: Color.fromARGB(255, 255, 102, 102),
+                          side: BorderSide(color: Colors.transparent, width: 1),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25.0),
+                          ),
+                          maximumSize:
+                              Size(screenWidth * 0.5, screenHeight * 0.05),
+                          onPrimary: Color.fromARGB(255, 255, 102, 102)),
                       child: Center(
                         child: Text(
                           'Cập nhật',

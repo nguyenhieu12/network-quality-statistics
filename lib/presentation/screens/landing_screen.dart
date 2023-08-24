@@ -7,13 +7,15 @@ import 'package:network_quality_statistic/presentation/screens/setting_screen.da
 import '../../logic/blocs/landing/landing_bloc.dart';
 
 class LandingScreen extends StatefulWidget {
+  int id;
   String fullName;
   String email;
   String phoneNumber;
   String imageUrl;
 
   LandingScreen(
-      {required this.fullName,
+      {required this.id,
+      required this.fullName,
       required this.email,
       required this.phoneNumber,
       required this.imageUrl});
@@ -53,6 +55,7 @@ class _LandingScreenState extends State<LandingScreen> {
       DashboardScreen(),
       LineScreen(),
       SettingScreen(
+          id: widget.id,
           fullName: widget.fullName,
           email: widget.email,
           phoneNumber: widget.phoneNumber,

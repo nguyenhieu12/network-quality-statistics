@@ -1,19 +1,14 @@
 part of 'setting_bloc.dart';
 
-sealed class SettingState extends Equatable {
+sealed class SettingState {
   const SettingState();
 
-  @override
-  List<Object> get props => [];
 }
 
 sealed class SettingActionState extends SettingState {}
 
 final class SettingInitial extends SettingState {
-  // SharedPreferences prefs;
-
-  // SettingInitial({required this.prefs});
-  // SettingInitial(SwitchOffState switchOffState);
+  
 }
 
 class SwitchOnState extends SettingState {}

@@ -20,6 +20,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<Map<String, dynamic>> mediumGeoJson = [];
   List<Map<String, dynamic>> highGeoJson = [];
   List<dynamic> provincesValue = [];
+  Set<String> provinceQuantity = {};
+  Set<String> lowQuantity = {};
+  Set<String> mediumQuantity = {};
+  Set<String> highQuantity = {};
   Uuid uuid = const Uuid();
   int lowThreshold = 30;
   int highThreshold = 70;
@@ -49,8 +53,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     'Miền Nam'
   ];
 
-  final List<int> lowOptions = [20, 30, 40, 50];
-  final List<int> highOptions = [60, 70, 80, 90];
+  final List<int> lowOptions = [10, 20, 30, 40, 50, 60, 70, 80, 90];
+  final List<int> highOptions = [10, 20, 30, 40, 50, 60, 70, 80, 90];
 
   Future<void> initMapAll() async {
     try {
@@ -80,23 +84,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
         for (var item in geoJsonData['features']) item['id']: item
       };
 
-      for (int i = 0; i < provinceData.length; i++) {
-        if (i == 0) {
-          debugPrint('TEST: ${provinceData[i]}');
-        }
-      }
-
-      for (int i = 0; i < features.length; i++) {
-        debugPrint('HEHE: ${features[i]['kqi'].runtimeType}');
-      }
-
       for (int i = 0; i < features.length; i++) {
         if (features[i]['kqi'] < lowThreshold) {
           lowGeoJson.add(features[i]);
+          lowQuantity.add(features[i]['properties']['Name_VI']);
+          provinceQuantity.add(features[i]['properties']['Name_VI']);
         } else if (features[i]['kqi'] > highThreshold) {
           highGeoJson.add(features[i]);
+          highQuantity.add(features[i]['properties']['Name_VI']);
+          provinceQuantity.add(features[i]['properties']['Name_VI']);
         } else {
           mediumGeoJson.add(features[i]);
+          mediumQuantity.add(features[i]['properties']['Name_VI']);
+          provinceQuantity.add(features[i]['properties']['Name_VI']);
         }
       }
 
@@ -142,10 +142,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
         if (provincesName[i] == features[j]['properties']['Name_VI']) {
           if (features[j]['kqi'] < lowThreshold) {
             lowGeoJson.add(features[j]);
+            provinceQuantity.add(features[i]['properties']['Name_VI']);
+            lowQuantity.add(features[i]['properties']['Name_VI']);
           } else if (features[j]['kqi'] > highThreshold) {
             highGeoJson.add(features[j]);
+            provinceQuantity.add(features[i]['properties']['Name_VI']);
+            highQuantity.add(features[i]['properties']['Name_VI']);
           } else {
             mediumGeoJson.add(features[j]);
+            provinceQuantity.add(features[i]['properties']['Name_VI']);
+            mediumQuantity.add(features[i]['properties']['Name_VI']);
           }
         }
       }
@@ -191,52 +197,56 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 LatLng(10.079575, 106.0102799), 6.35)));
   }
 
-  Future<void> initMapProvince(String province) async {
-    List<dynamic> features = geoJsonData['features'];
+  // Future<void> initMapProvince(String province) async {
+  //   List<dynamic> features = geoJsonData['features'];
 
-    for (int i = 0; i < features.length; i++) {
-      if (province == features[i]['properties']['Name_VI']) {
-        if (features[i]['kqi'] < lowThreshold) {
-          lowGeoJson.add(features[i]);
-        } else if (features[i]['kqi'] > highThreshold) {
-          highGeoJson.add(features[i]);
-        } else {
-          mediumGeoJson.add(features[i]);
-        }
-      }
-    }
+  //   for (int i = 0; i < features.length; i++) {
+  //     if (province == features[i]['properties']['Name_VI']) {
+  //       if (features[i]['kqi'] < lowThreshold) {
+  //         lowGeoJson.add(features[i]);
+  //       } else if (features[i]['kqi'] > highThreshold) {
+  //         highGeoJson.add(features[i]);
+  //       } else {
+  //         mediumGeoJson.add(features[i]);
+  //       }
+  //     }
+  //   }
 
-    if (lowGeoJson.isNotEmpty) {
-      Map<String, dynamic> lowFeatureCollection = {
-        "type": "FeatureCollection",
-        "features": lowGeoJson,
-      };
+  //   if (lowGeoJson.isNotEmpty) {
+  //     Map<String, dynamic> lowFeatureCollection = {
+  //       "type": "FeatureCollection",
+  //       "features": lowGeoJson,
+  //     };
 
-      addLayer('sourceId-$province', 'layerId-$province', lowFeatureCollection,
-          '#FF6666');
-    } else if (mediumGeoJson.isNotEmpty) {
-      Map<String, dynamic> mediumFeatureCollection = {
-        "type": "FeatureCollection",
-        "features": mediumGeoJson,
-      };
+  //     addLayer('sourceId-$province', 'layerId-$province', lowFeatureCollection,
+  //         '#FF6666');
+  //   } else if (mediumGeoJson.isNotEmpty) {
+  //     Map<String, dynamic> mediumFeatureCollection = {
+  //       "type": "FeatureCollection",
+  //       "features": mediumGeoJson,
+  //     };
 
-      addLayer('sourceId-$province', 'layerId-$province',
-          mediumFeatureCollection, '#FF9900');
-    } else {
-      Map<String, dynamic> highFeatureCollection = {
-        "type": "FeatureCollection",
-        "features": highGeoJson,
-      };
+  //     addLayer('sourceId-$province', 'layerId-$province',
+  //         mediumFeatureCollection, '#FF9900');
+  //   } else {
+  //     Map<String, dynamic> highFeatureCollection = {
+  //       "type": "FeatureCollection",
+  //       "features": highGeoJson,
+  //     };
 
-      addLayer('sourceId-$province', 'layerId-$province', highFeatureCollection,
-          '#E4C623');
-    }
-  }
+  //     addLayer('sourceId-$province', 'layerId-$province', highFeatureCollection,
+  //         '#E4C623');
+  //   }
+  // }
 
   Future<void> removeAllLayers() async {
     lowGeoJson.clear();
     mediumGeoJson.clear();
     highGeoJson.clear();
+    provinceQuantity.clear();
+    lowQuantity.clear();
+    mediumQuantity.clear();
+    highQuantity.clear();
 
     await mapController.removeLayer('layerId-low');
     await mapController.removeSource('sourceId-low');
@@ -252,6 +262,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     lowGeoJson.clear();
     mediumGeoJson.clear();
     highGeoJson.clear();
+    provinceQuantity.clear();
+    lowQuantity.clear();
+    mediumQuantity.clear();
+    highQuantity.clear();
 
     await mapController.removeLayer('layerId-low-$selectedArea');
     await mapController.removeSource('sourceId-low-$selectedArea');
@@ -265,14 +279,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     debugPrint('AREA: $selectedArea DELETED');
   }
 
-  Future<void> removeProvinceLayer(String province) async {
-    lowGeoJson.clear();
-    mediumGeoJson.clear();
-    highGeoJson.clear();
+  // Future<void> removeProvinceLayer(String province) async {
+  //   lowGeoJson.clear();
+  //   mediumGeoJson.clear();
+  //   highGeoJson.clear();
 
-    await mapController.removeLayer('layerId-$province');
-    await mapController.removeSource('sourceId-$province');
-  }
+  //   await mapController.removeLayer('layerId-$province');
+  //   await mapController.removeSource('sourceId-$province');
+  // }
 
   void addLayer(String sourceId, String layerId,
       Map<String, dynamic> geoJsonSource, String color) async {
@@ -448,7 +462,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  void _showBottomSheet(BuildContext context) {
+  void showAreaOptions(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
@@ -463,7 +477,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Stack(
             children: [
               Padding(
-                padding: EdgeInsets.only(top: 40, left: 10),
+                padding: EdgeInsets.only(top: 20, left: 10),
                 child: IconButton(
                     onPressed: () {
                       Navigator.pop(context);
@@ -479,7 +493,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                     Padding(
-                      padding: EdgeInsets.only(top: 30),
+                      padding: EdgeInsets.only(top: 5),
                       child: Text(
                         'Chọn phạm vi',
                         style: TextStyle(fontSize: 24),
@@ -591,6 +605,72 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  void alertThresholdError(double screenWidth, double screenHeight) {
+    showDialog(
+        context: context,
+        builder: ((BuildContext context) {
+          double height = MediaQuery.of(context).size.height;
+          double width = MediaQuery.of(context).size.width;
+
+          return AlertDialog(
+            backgroundColor: Color.fromARGB(255, 255, 80, 80),
+            title: Center(
+              child: const Text(
+                'Lỗi giá trị',
+                style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400),
+              ),
+            ),
+            content: Container(
+              height: height * 0.1,
+              width: width * 0.95,
+              child: Column(
+                children: [
+                  Text(
+                    'Ngưỡng dưới không thể lớn',
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w400),
+                  ),
+                  Text(
+                    'hơn hoặc bằng ngưỡng trên',
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w400),
+                  )
+                ],
+              ),
+            ),
+            actions: [
+              Center(
+                child: Container(
+                  width: screenWidth * 0.4,
+                  height: screenHeight * 0.05,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                    child: Center(
+                      child: Text(
+                        'Đóng',
+                        style: TextStyle(
+                            fontSize: 22,
+                            color: Color.fromARGB(255, 255, 80, 80),
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          );
+        }));
+  }
+
   void showThresholdOptions(double screenWidth, double screenHeight) {
     showModalBottomSheet(
       context: context,
@@ -654,9 +734,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             child: DropdownButtonFormField<int>(
                               value: lowThreshold,
                               onChanged: (newValue) {
-                                setState(() {
-                                  lowThreshold = newValue!;
-                                });
+                                if (newValue! >= highThreshold) {
+                                  Navigator.pop(context);
+                                  setState(() {
+                                    showThresholdOptions(
+                                        screenWidth, screenHeight);
+                                    alertThresholdError(
+                                        screenWidth, screenHeight);
+                                  });
+                                } else {
+                                  setState(() {
+                                    lowThreshold = newValue;
+                                  });
+                                }
                               },
                               items: lowOptions.map((int value) {
                                 return DropdownMenuItem(
@@ -710,9 +800,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             child: DropdownButtonFormField(
                               value: highThreshold,
                               onChanged: (newValue) {
-                                setState(() {
-                                  highThreshold = newValue!;
-                                });
+                                if (newValue! <= lowThreshold) {
+                                  Navigator.pop(context);
+                                  setState(() {
+                                    showThresholdOptions(
+                                        screenWidth, screenHeight);
+                                    alertThresholdError(
+                                        screenWidth, screenHeight);
+                                  });
+                                } else {
+                                  setState(() {
+                                    highThreshold = newValue;
+                                  });
+                                }
                               },
                               items: highOptions.map((int value) {
                                 return DropdownMenuItem(
@@ -747,8 +847,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         width: screenWidth * 0.4,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                              side: BorderSide(color: Colors.red),
-                              backgroundColor: Colors.white),
+                              backgroundColor:
+                                  Color.fromARGB(255, 255, 80, 80)),
                           onPressed: () async {
                             if (isAll) {
                               await removeAllLayers();
@@ -765,9 +865,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             child: Text(
                               'Áp dụng',
                               style: TextStyle(
-                                  color: Colors.red,
+                                  color: Colors.white,
                                   fontSize: 20,
-                                  fontWeight: FontWeight.w400),
+                                  fontWeight: FontWeight.w500),
                             ),
                           ),
                         ),
@@ -805,12 +905,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       height: screenHeight * 0.042,
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          side: BorderSide(color: Colors.black, width: 1.5),
-                        ),
+                            backgroundColor: Colors.white,
+                            side: BorderSide(color: Colors.black, width: 1.5),
+                            onPrimary: Color.fromARGB(255, 255, 80, 80)),
                         onPressed: () {
-                          _showBottomSheet(context);
-                          // showThresholdOptions(screenWidth, screenHeight);
+                          showAreaOptions(context);
                         },
                         icon: Icon(
                           Icons.border_all_rounded,
@@ -832,9 +931,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       height: screenHeight * 0.042,
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          side: BorderSide(color: Colors.black, width: 1.5),
-                        ),
+                            backgroundColor: Colors.white,
+                            side: BorderSide(color: Colors.black, width: 1.5),
+                            onPrimary: Color.fromARGB(255, 255, 80, 80)),
                         onPressed: () {
                           showThresholdOptions(screenWidth, screenHeight);
                         },
@@ -861,24 +960,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   StatisticWidget(
                       label: 'Tốt',
-                      statistic: (highGeoJson.length).toString() +
+                      statistic: (highQuantity.length).toString() +
                           '/' +
-                          (provincesValue.length).toString(),
-                      percent:
-                          ((highGeoJson.length) / (provincesValue.length) * 100)
-                                  .toStringAsFixed(2) +
-                              '%',
+                          (provinceQuantity.length).toString(),
+                      percent: ((highQuantity.length) /
+                                  (provincesValue.length) *
+                                  100)
+                              .toStringAsFixed(2) +
+                          '%',
                       color: Color.fromARGB(255, 67, 217, 13),
                       screenWidth: screenWidth,
                       screenHeight: screenHeight),
                   StatisticWidget(
                       label: 'Trung bình',
-                      statistic: (63 - lowGeoJson.length - highGeoJson.length)
-                              .toString() +
+                      statistic: (mediumQuantity.length).toString() +
                           '/' +
-                          (provincesValue.length).toString(),
-                      percent: ((63 - lowGeoJson.length - highGeoJson.length) /
-                                  (provincesValue.length) *
+                          (provinceQuantity.length).toString(),
+                      percent: ((mediumQuantity.length) /
+                                  (provinceQuantity.length) *
                                   100)
                               .toStringAsFixed(2) +
                           '%',
@@ -887,13 +986,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       screenHeight: screenHeight),
                   StatisticWidget(
                       label: 'Tồi',
-                      statistic: (lowGeoJson.length).toString() +
+                      statistic: (lowQuantity.length).toString() +
                           '/' +
-                          (provincesValue.length).toString(),
-                      percent:
-                          ((lowGeoJson.length) / (provincesValue.length) * 100)
-                                  .toStringAsFixed(2) +
-                              '%',
+                          (provinceQuantity.length).toString(),
+                      percent: ((lowQuantity.length) /
+                                  (provinceQuantity.length) *
+                                  100)
+                              .toStringAsFixed(2) +
+                          '%',
                       color: Color.fromARGB(255, 255, 80, 80),
                       screenWidth: screenWidth,
                       screenHeight: screenHeight),

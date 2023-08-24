@@ -11,13 +11,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../logic/blocs/setting/setting_bloc.dart';
 
 class SettingScreen extends StatefulWidget {
+  int id;
   String fullName;
   String email;
   String phoneNumber;
   String imageUrl;
 
   SettingScreen(
-      {required this.fullName,
+      {required this.id,
+      required this.fullName,
       required this.email,
       required this.phoneNumber,
       required this.imageUrl});
@@ -69,6 +71,7 @@ class _SettingScreenState extends State<SettingScreen> {
           case NavigateToAccountInfoState:
             NavigateToAccountInfoState currentState =
                 state as NavigateToAccountInfoState;
+            debugPrint('BROO');
             Navigator.push(
                 context,
                 changePage(AccountInfoScreen(
@@ -80,6 +83,7 @@ class _SettingScreenState extends State<SettingScreen> {
             Navigator.push(
                 context,
                 changePage(UpdateAccountScreen(
+                  id: widget.id,
                   fullName: widget.fullName,
                   email: widget.email,
                   phoneNumber: widget.phoneNumber,

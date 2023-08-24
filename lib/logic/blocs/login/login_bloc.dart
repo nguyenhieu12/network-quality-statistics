@@ -32,6 +32,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       prefs.setString('province', loginUser['province']);
       prefs.setString('imageUrl', loginUser['imageUrl']);
       emit(LoginSuccessState(
+          id: loginUser['id'],
           fullName: loginUser['fullName'],
           email: loginUser['email'],
           phoneNumber: loginUser['phoneNumber'],

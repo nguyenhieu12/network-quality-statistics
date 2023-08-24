@@ -42,4 +42,17 @@ class UserRepository {
     final db = await DatabaseHepler.db();
     return db.query('users');
   }
+
+  static Future updateUser(int id, String newImageUrl, String newPhoneNumber) async {
+    final db = await DatabaseHepler.db();
+
+    final data = {
+      'phoneNumber': newPhoneNumber,
+      'imageUrl': newImageUrl,
+    };
+
+    await db.update('users', data, where: "id = ?", whereArgs: [id]);
+
+    await db.close();
+  }
 }

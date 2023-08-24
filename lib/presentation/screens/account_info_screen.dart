@@ -44,7 +44,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                       children: [
                         IconButton(
                           onPressed: () {
-                            Navigator.pop(context);
+                            Navigator.of(context).pop(true);
                           },
                           icon: Icon(
                             Icons.arrow_back,

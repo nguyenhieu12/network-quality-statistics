@@ -9,13 +9,15 @@ final class LoginInitial extends LoginState {}
 class LoginLoadingState extends LoginState {}
 
 class LoginSuccessState extends LoginActionState {
+  int id;
   String fullName;
   String email;
   String phoneNumber;
   String imageUrl;
 
   LoginSuccessState(
-      {required this.fullName,
+      {required this.id,
+      required this.fullName,
       required this.email,
       required this.phoneNumber,
       required this.imageUrl});

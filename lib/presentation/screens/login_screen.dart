@@ -27,16 +27,18 @@ class _LoginScreenState extends State<LoginScreen> {
     return BlocConsumer<LoginBloc, LoginState>(
       bloc: loginBloc,
       listenWhen: (previous, current) => current is LoginActionState,
-      buildWhen: (previous, current) => current is! LoginActionState,
+      buildWhen: (previous, current) => current is !LoginActionState,
       listener: (context, state) {
         if (state is LoginSuccessState) {
           Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => LandingScreen(
-                      fullName: state.fullName, email: state.email, phoneNumber: state.phoneNumber, imageUrl: state.imageUrl)));
-          debugPrint('Email: ${emailController.text}');
-          debugPrint('Email: ${passwordController.text}');
+                      id: state.id,
+                      fullName: state.fullName,
+                      email: state.email,
+                      phoneNumber: state.phoneNumber,
+                      imageUrl: state.imageUrl)));
         } else if (state is ShowLoginFailedState) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Center(
@@ -141,44 +143,52 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     SizedBox(
                       width: screenWidth * 0.9,
-                      child: Row(children: [
-                        Checkbox(
-                          value: isRememberSelected,
-                          onChanged: (bool? newValue) {
-                            setState(() {
-                              isRememberSelected = newValue!;
-                            });
-                          },
-                          side: MaterialStateBorderSide.resolveWith((states) =>
-                              BorderSide(color: Colors.white, width: 1.0)),
-                        ),
-                        SizedBox(height: screenHeight * 0.08),
-                        Text(
-                          'Ghi nhớ đăng nhập',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 17,
-                              fontWeight: FontWeight.normal),
-                        ),
-                        Spacer(),
-                        TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            'Quên mật khẩu?',
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isRememberSelected = !isRememberSelected;
+                          });
+                        },
+                        child: Row(children: [
+                          Checkbox(
+                            value: isRememberSelected,
+                            onChanged: (bool? newValue) {
+                              setState(() {
+                                isRememberSelected = newValue!;
+                              });
+                            },
+                            side: MaterialStateBorderSide.resolveWith((states) =>
+                                BorderSide(color: Colors.white, width: 1.0)),
+                            activeColor: const Color.fromARGB(255, 255, 102, 102),
+                            checkColor: Colors.white,
+                          ),
+                          SizedBox(height: screenHeight * 0.08),
+                          Text(
+                            'Ghi nhớ đăng nhập',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 17,
                                 fontWeight: FontWeight.normal),
                           ),
-                        )
-                      ]),
+                          Spacer(),
+                          TextButton(
+                            onPressed: () {},
+                            child: Text(
+                              'Quên mật khẩu?',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.normal),
+                            ),
+                          )
+                        ]),
+                      ),
                     ),
                     SizedBox(height: screenWidth * 0.05),
                     ElevatedButton(
                       onPressed: () {
                         loginBloc.add(LoginButtonClickedEvent(
-                            email: 'toanquoc@gmail.com',
-                            password: 'toanquoc'));
+                            email: 'toanquoc@gmail.com', password: 'toanquoc'));
                         FocusScope.of(context).unfocus();
                       },
                       child: Text(
