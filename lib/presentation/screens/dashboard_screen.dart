@@ -85,18 +85,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
       };
 
       for (int i = 0; i < features.length; i++) {
-        if (features[i]['kqi'] < lowThreshold) {
+        int value = features[i]['kqi'];
+        String provinceName = features[i]['properties']['Name_VI'];
+
+        if (value < lowThreshold) {
           lowGeoJson.add(features[i]);
-          lowQuantity.add(features[i]['properties']['Name_VI']);
-          provinceQuantity.add(features[i]['properties']['Name_VI']);
-        } else if (features[i]['kqi'] > highThreshold) {
+          lowQuantity.add(provinceName);
+          provinceQuantity.add(provinceName);
+        } else if (value > highThreshold) {
           highGeoJson.add(features[i]);
-          highQuantity.add(features[i]['properties']['Name_VI']);
-          provinceQuantity.add(features[i]['properties']['Name_VI']);
+          highQuantity.add(provinceName);
+          provinceQuantity.add(provinceName);
         } else {
           mediumGeoJson.add(features[i]);
-          mediumQuantity.add(features[i]['properties']['Name_VI']);
-          provinceQuantity.add(features[i]['properties']['Name_VI']);
+          mediumQuantity.add(provinceName);
+          provinceQuantity.add(provinceName);
         }
       }
 
@@ -134,7 +137,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Map<String, dynamic> areaData = json.decode(area);
     List<dynamic> provincesName = areaData[selectedArea];
 
-    debugPrint('HUHU: $provincesName');
     List<dynamic> features = geoJsonData['features'];
 
     for (int i = 0; i < provincesName.length; i++) {
@@ -195,6 +197,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 CameraUpdate.newLatLngZoom(LatLng(15.386838, 106.578776), 5.15))
             : await mapController.moveCamera(CameraUpdate.newLatLngZoom(
                 LatLng(10.079575, 106.0102799), 6.35)));
+
+    setState(() {
+      
+    });
   }
 
   // Future<void> initMapProvince(String province) async {
@@ -888,135 +894,138 @@ class _DashboardScreenState extends State<DashboardScreen> {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      body: Container(
-        color: Colors.white,
-        child: SingleChildScrollView(
-          physics: NeverScrollableScrollPhysics(),
-          child: Column(
-            children: [
-              SizedBox(height: screenHeight * 0.08),
-              Container(
-                width: screenWidth * 0.95,
-                child: Row(
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: Container(
+          color: Colors.white,
+          child: SingleChildScrollView(
+            physics: NeverScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                SizedBox(height: screenHeight * 0.08),
+                Container(
+                  width: screenWidth * 0.95,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: screenWidth * 0.46,
+                        height: screenHeight * 0.042,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              side: BorderSide(color: Colors.black, width: 1.5),
+                              onPrimary: Color.fromARGB(255, 255, 80, 80)),
+                          onPressed: () {
+                            showAreaOptions(context);
+                          },
+                          icon: Icon(
+                            Icons.border_all_rounded,
+                            size: 22,
+                            color: Colors.black,
+                          ),
+                          label: Text(
+                            'Phạm vi',
+                            style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.black,
+                                fontWeight: FontWeight.normal),
+                          ),
+                        ),
+                      ),
+                      Spacer(),
+                      Container(
+                        width: screenWidth * 0.46,
+                        height: screenHeight * 0.042,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              side: BorderSide(color: Colors.black, width: 1.5),
+                              onPrimary: Color.fromARGB(255, 255, 80, 80)),
+                          onPressed: () {
+                            showThresholdOptions(screenWidth, screenHeight);
+                          },
+                          icon: Icon(
+                            Icons.data_thresholding_outlined,
+                            size: 22,
+                            color: Colors.black,
+                          ),
+                          label: Text(
+                            'Chọn ngưỡng',
+                            style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.black,
+                                fontWeight: FontWeight.normal),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(height: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Container(
-                      width: screenWidth * 0.46,
-                      height: screenHeight * 0.042,
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            side: BorderSide(color: Colors.black, width: 1.5),
-                            onPrimary: Color.fromARGB(255, 255, 80, 80)),
-                        onPressed: () {
-                          showAreaOptions(context);
-                        },
-                        icon: Icon(
-                          Icons.border_all_rounded,
-                          size: 22,
-                          color: Colors.black,
-                        ),
-                        label: Text(
-                          'Phạm vi',
-                          style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal),
-                        ),
-                      ),
-                    ),
-                    Spacer(),
-                    Container(
-                      width: screenWidth * 0.46,
-                      height: screenHeight * 0.042,
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            side: BorderSide(color: Colors.black, width: 1.5),
-                            onPrimary: Color.fromARGB(255, 255, 80, 80)),
-                        onPressed: () {
-                          showThresholdOptions(screenWidth, screenHeight);
-                        },
-                        icon: Icon(
-                          Icons.data_thresholding_outlined,
-                          size: 22,
-                          color: Colors.black,
-                        ),
-                        label: Text(
-                          'Chọn ngưỡng',
-                          style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal),
-                        ),
-                      ),
-                    )
+                    StatisticWidget(
+                        label: 'Tốt',
+                        statistic: (highQuantity.length).toString() +
+                            '/' +
+                            (provinceQuantity.length).toString(),
+                        percent: (((highQuantity.length) /
+                                    (provinceQuantity.length)) *
+                                    100.0)
+                                .toStringAsFixed(2) +
+                            '%',
+                        color: Color.fromARGB(255, 67, 217, 13),
+                        screenWidth: screenWidth,
+                        screenHeight: screenHeight),
+                    StatisticWidget(
+                        label: 'Trung bình',
+                        statistic: (mediumQuantity.length).toString() +
+                            '/' +
+                            (provinceQuantity.length).toString(),
+                        percent: (((mediumQuantity.length) /
+                                    (provinceQuantity.length)) *
+                                    100.0)
+                                .toStringAsFixed(2) +
+                            '%',
+                        color: Color.fromARGB(255, 255, 153, 0),
+                        screenWidth: screenWidth,
+                        screenHeight: screenHeight),
+                    StatisticWidget(
+                        label: 'Tồi',
+                        statistic: (lowQuantity.length).toString() +
+                            '/' +
+                            (provinceQuantity.length).toString(),
+                        percent: (((lowQuantity.length) /
+                                    (provinceQuantity.length)) *
+                                    100.0)
+                                .toStringAsFixed(2) +
+                            '%',
+                        color: Color.fromARGB(255, 255, 80, 80),
+                        screenWidth: screenWidth,
+                        screenHeight: screenHeight),
                   ],
                 ),
-              ),
-              SizedBox(height: 15),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  StatisticWidget(
-                      label: 'Tốt',
-                      statistic: (highQuantity.length).toString() +
-                          '/' +
-                          (provinceQuantity.length).toString(),
-                      percent: ((highQuantity.length) /
-                                  (provincesValue.length) *
-                                  100)
-                              .toStringAsFixed(2) +
-                          '%',
-                      color: Color.fromARGB(255, 67, 217, 13),
-                      screenWidth: screenWidth,
-                      screenHeight: screenHeight),
-                  StatisticWidget(
-                      label: 'Trung bình',
-                      statistic: (mediumQuantity.length).toString() +
-                          '/' +
-                          (provinceQuantity.length).toString(),
-                      percent: ((mediumQuantity.length) /
-                                  (provinceQuantity.length) *
-                                  100)
-                              .toStringAsFixed(2) +
-                          '%',
-                      color: Color.fromARGB(255, 255, 153, 0),
-                      screenWidth: screenWidth,
-                      screenHeight: screenHeight),
-                  StatisticWidget(
-                      label: 'Tồi',
-                      statistic: (lowQuantity.length).toString() +
-                          '/' +
-                          (provinceQuantity.length).toString(),
-                      percent: ((lowQuantity.length) /
-                                  (provinceQuantity.length) *
-                                  100)
-                              .toStringAsFixed(2) +
-                          '%',
-                      color: Color.fromARGB(255, 255, 80, 80),
-                      screenWidth: screenWidth,
-                      screenHeight: screenHeight),
-                ],
-              ),
-              Container(
-                child: Divider(
-                  thickness: 0.6,
+                Container(
+                  child: Divider(
+                    thickness: 0.6,
+                  ),
                 ),
-              ),
-              Container(
-                height: screenHeight * 0.65,
-                child: MapboxMap(
-                  accessToken:
-                      'sk.eyJ1IjoiaGlldW5tMTIxMiIsImEiOiJjbGxpdWZxbGUwa2xlM2pxdWt5dXBiaHpoIn0.V-v43bc4XXDm7dI5lNkGew',
-                  styleString:
-                      'mapbox://styles/hieunm1212/clkq6rt3s00cb01ph7e3z6dtx',
-                  initialCameraPosition: const CameraPosition(
-                      target: LatLng(15.702622, 105.690185), zoom: 4.6),
-                  onMapCreated: _onMapCreated,
+                Container(
+                  height: screenHeight * 0.65,
+                  child: MapboxMap(
+                    accessToken:
+                        'sk.eyJ1IjoiaGlldW5tMTIxMiIsImEiOiJjbGxpdWZxbGUwa2xlM2pxdWt5dXBiaHpoIn0.V-v43bc4XXDm7dI5lNkGew',
+                    styleString:
+                        'mapbox://styles/hieunm1212/clkq6rt3s00cb01ph7e3z6dtx',
+                    initialCameraPosition: const CameraPosition(
+                        target: LatLng(15.702622, 105.690185), zoom: 4.6),
+                    onMapCreated: _onMapCreated,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

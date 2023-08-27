@@ -38,7 +38,7 @@ class StatisticWidget extends StatelessWidget {
           Text(
             statistic,
             style: TextStyle(
-                fontSize: 20,
+                fontSize: 18,
                 color: Colors.white,
                 decoration: TextDecoration.none),
           ),

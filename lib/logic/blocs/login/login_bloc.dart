@@ -21,7 +21,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
             event.email, event.password);
     if (loginUser != null) {
       emit(LoginLoadingState());
-      await Future.delayed(const Duration(seconds: 3));
+      await Future.delayed(const Duration(seconds: 2));
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setInt('id', loginUser['id']);
       prefs.setString('email', loginUser['email']);

@@ -89,10 +89,13 @@ class _LandingScreenState extends State<LandingScreen> {
                   ],
                 )
               : null,
-          child: Scaffold(
-            resizeToAvoidBottomInset: false,
-            body: screenList[currentIndex],
-            bottomNavigationBar: buildBottomNavigationBar(currentIndex),
+          child: WillPopScope(
+            onWillPop: () async => false,
+            child: Scaffold(
+              resizeToAvoidBottomInset: false,
+              body: screenList[currentIndex],
+              bottomNavigationBar: buildBottomNavigationBar(currentIndex),
+            ),
           ),
         );
       },

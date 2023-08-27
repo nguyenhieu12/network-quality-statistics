@@ -22,116 +22,119 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      body: Container(
-          color: Colors.white,
-          child: Stack(
-            children: [
-              ClipPath(
-                  clipper: AccountInfoClipPath(),
-                  child: Container(
-                      height: screenHeight * 0.4,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: const BoxDecoration(
-                          color: Color.fromARGB(255, 255, 102, 102)))),
-              Container(
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    SizedBox(height: screenHeight * 0.1),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.of(context).pop(true);
-                          },
-                          icon: Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
-                            size: 36,
-                          ),
-                        ),
-                        Text(
-                          'Thông tin tài khoản',
-                          style: TextStyle(
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: Container(
+            color: Colors.white,
+            child: Stack(
+              children: [
+                ClipPath(
+                    clipper: AccountInfoClipPath(),
+                    child: Container(
+                        height: screenHeight * 0.4,
+                        width: MediaQuery.of(context).size.width,
+                        decoration: const BoxDecoration(
+                            color: Color.fromARGB(255, 255, 102, 102)))),
+                Container(
+                  width: double.infinity,
+                  child: Column(
+                    children: [
+                      SizedBox(height: screenHeight * 0.1),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(true);
+                            },
+                            icon: Icon(
+                              Icons.arrow_back,
                               color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 30,
-                              decoration: TextDecoration.none),
-                        )
-                      ],
-                    ),
-                    SizedBox(height: screenHeight * 0.08),
-                    CircleAvatar(
-                      radius: 80.0,
-                      backgroundImage: NetworkImage(widget.imageUrl),
-                      backgroundColor: Colors.transparent,
-                    ),
-                    SizedBox(height: 30),
-                    Text(
-                      widget.fullName,
-                      style: TextStyle(
-                        fontSize: 24,
-                        color: Colors.black,
-                        decoration: TextDecoration.none,
-                        fontWeight: FontWeight.w400
-                      ),
-                    ),
-                    SizedBox(height: 30,),
-                    Padding(
-                      padding: EdgeInsets.only(left: screenWidth * 0.1),
-                      child: Row(
-                        children: [
-                          Icon(Icons.email_outlined, color: Colors.red, size: 30,),
-                          SizedBox(width: 20,),
-                          Text(widget.email,
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.black,
-                              decoration: TextDecoration.none,
-                              fontWeight: FontWeight.w400
+                              size: 36,
                             ),
+                          ),
+                          Text(
+                            'Thông tin tài khoản',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 30,
+                                decoration: TextDecoration.none),
                           )
                         ],
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(left: screenWidth * 0.2),
-                      child: Container(
-                        child: const Divider(),
+                      SizedBox(height: screenHeight * 0.08),
+                      CircleAvatar(
+                        radius: 80.0,
+                        backgroundImage: NetworkImage(widget.imageUrl),
+                        backgroundColor: Colors.transparent,
                       ),
-                    ),
-                    SizedBox(height: 20),
-                    Padding(
-                      padding: EdgeInsets.only(left: screenWidth * 0.1),
-                      child: Row(
-                        children: [
-                          Icon(Icons.phone, color: Colors.red, size: 30,),
-                          SizedBox(width: 20,),
-                          Text(widget.phoneNumber,
-                            style: TextStyle(
-                              fontSize: 20,
-                              color: Colors.black,
-                              decoration: TextDecoration.none,
-                              fontWeight: FontWeight.w400
-                            ),
-                          )
-                        ],
+                      SizedBox(height: 30),
+                      Text(
+                        widget.fullName,
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: Colors.black,
+                          decoration: TextDecoration.none,
+                          fontWeight: FontWeight.w400
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(left: screenWidth * 0.2),
-                      child: Container(
-                        child: const Divider(),
+                      SizedBox(height: 30,),
+                      Padding(
+                        padding: EdgeInsets.only(left: screenWidth * 0.1),
+                        child: Row(
+                          children: [
+                            Icon(Icons.email_outlined, color: Colors.red, size: 30,),
+                            SizedBox(width: 20,),
+                            Text(widget.email,
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.black,
+                                decoration: TextDecoration.none,
+                                fontWeight: FontWeight.w400
+                              ),
+                            )
+                          ],
+                        ),
                       ),
-                    )
-                  ],
-                ),
-              )
-            ],
-          )),
-          
+                      Padding(
+                        padding: EdgeInsets.only(left: screenWidth * 0.2),
+                        child: Container(
+                          child: const Divider(),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Padding(
+                        padding: EdgeInsets.only(left: screenWidth * 0.1),
+                        child: Row(
+                          children: [
+                            Icon(Icons.phone, color: Colors.red, size: 30,),
+                            SizedBox(width: 20,),
+                            Text(widget.phoneNumber,
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.black,
+                                decoration: TextDecoration.none,
+                                fontWeight: FontWeight.w400
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: screenWidth * 0.2),
+                        child: Container(
+                          child: const Divider(),
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            )),
+            
+      ),
     );
   }
 }
