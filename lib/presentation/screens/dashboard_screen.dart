@@ -59,11 +59,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> initMapAll() async {
     try {
       String data =
-          await rootBundle.loadString('assets/vietnam_province.geojson');
+          await rootBundle.loadString('assets/data/vietnam_province.geojson');
       geoJsonData = json.decode(data);
 
       String provinces =
-          await rootBundle.loadString('assets/province_data.json');
+          await rootBundle.loadString('assets/data/province_data.json');
       provincesValue = json.decode(provinces);
 
       List<dynamic> features = geoJsonData['features'];
@@ -133,7 +133,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> initMapArea(String selectedArea) async {
-    String area = await rootBundle.loadString('assets/province_domain.json');
+    String area = await rootBundle.loadString('assets/data/province_domain.json');
     Map<String, dynamic> areaData = json.decode(area);
     List<dynamic> provincesName = areaData[selectedArea];
 

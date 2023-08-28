@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:network_quality_statistic/presentation/screens/email_verification_screen.dart';
 import 'package:network_quality_statistic/presentation/screens/sms_verification_screen.dart';
+import 'package:network_quality_statistic/utils/change_page.dart';
 
 class ResetOptionsScreen extends StatefulWidget {
   const ResetOptionsScreen({super.key});
@@ -10,39 +11,6 @@ class ResetOptionsScreen extends StatefulWidget {
 }
 
 class _ResetOptionsScreenState extends State<ResetOptionsScreen> {
-  PageRouteBuilder changePage(Widget page) {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => page,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(1.0, 0.0);
-        const end = Offset.zero;
-        const curve = Curves.easeInOut;
-        const duration = Duration(seconds: 2);
-
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-        var offsetAnimation = tween.animate(
-          CurvedAnimation(
-            parent: animation,
-            curve: Interval(0, 1, curve: curve),
-          ),
-        );
-
-        return AnimatedBuilder(
-          animation: animation,
-          builder: (context, child) {
-            return SlideTransition(
-              position: offsetAnimation,
-              child: child,
-            );
-          },
-          child: child,
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -84,13 +52,13 @@ class _ResetOptionsScreenState extends State<ResetOptionsScreen> {
                   'Chọn phương thức lấy lại mật khẩu',
                   style: TextStyle(
                       color: Colors.white,
-                      fontSize: 24,
+                      fontSize: 22,
                       fontStyle: FontStyle.italic),
                 ),
                 SizedBox(height: screenHeight * 0.05),
                 GestureDetector(
                   onTap: () => Navigator.push(
-                      context, changePage(SMSVerificationScreen())),
+                      context, ChangePage.changePage(SMSVerificationScreen())),
                   child: Container(
                     width: screenWidth * 0.8,
                     height: screenHeight * 0.2,
@@ -111,7 +79,7 @@ class _ResetOptionsScreenState extends State<ResetOptionsScreen> {
                           'Tin nhắn qua SMS',
                           style: TextStyle(
                             color: Colors.red,
-                            fontSize: 24,
+                            fontSize: 22,
                           ),
                           maxLines: 2,
                         )
@@ -122,7 +90,7 @@ class _ResetOptionsScreenState extends State<ResetOptionsScreen> {
                 SizedBox(height: screenHeight * 0.05),
                 GestureDetector(
                   onTap: () => Navigator.push(
-                      context, changePage(EmailVerificationScreen())),
+                      context, ChangePage.changePage(EmailVerificationScreen())),
                   child: Container(
                       width: screenWidth * 0.8,
                       height: screenHeight * 0.2,
@@ -143,7 +111,7 @@ class _ResetOptionsScreenState extends State<ResetOptionsScreen> {
                             'Email',
                             style: TextStyle(
                               color: Colors.red,
-                              fontSize: 24,
+                              fontSize: 22,
                             ),
                             maxLines: 2,
                           )

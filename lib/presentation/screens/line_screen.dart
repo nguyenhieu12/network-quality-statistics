@@ -162,7 +162,7 @@ class _LineScreenState extends State<LineScreen> {
 
   Future<void> loadJSONData() async {
     try {
-      String jsonString = await rootBundle.loadString('assets/line_data.json');
+      String jsonString = await rootBundle.loadString('assets/data/line_data.json');
       jsonData = json.decode(jsonString);
       for (int i = 0; i < jsonData.length; i++) {
         jsonData[i]['id'] = uuid.v4();

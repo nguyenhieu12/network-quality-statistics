@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:network_quality_statistic/presentation/screens/account_info_screen.dart';
 import 'package:network_quality_statistic/presentation/screens/login_screen.dart';
 import 'package:network_quality_statistic/presentation/screens/update_account_screen.dart';
+import 'package:network_quality_statistic/utils/change_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../logic/blocs/setting/setting_bloc.dart';
@@ -33,31 +34,6 @@ class _SettingScreenState extends State<SettingScreen> {
   bool isTurnOnBiometric = false;
   final SettingBloc settingBloc = SettingBloc();
 
-  PageRouteBuilder changePage(Widget page) {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => page,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(1.0, 0.0);
-        const end = Offset.zero;
-        const curve = Curves.easeInOut;
-
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-        return AnimatedBuilder(
-          animation: animation,
-          builder: (context, child) {
-            return SlideTransition(
-              position: tween.animate(animation),
-              child: child,
-            );
-          },
-          child: child,
-        );
-      },
-    );
-  }
-
   void showBiometricsAlert(double screenWidth, double screenHeight) {
     showDialog(
         context: context,
@@ -71,7 +47,7 @@ class _SettingScreenState extends State<SettingScreen> {
               child: const Text(
                 'Đăng nhập bằng vân tay',
                 style: TextStyle(
-                    fontSize: 30,
+                    fontSize: 24,
                     color: Colors.white,
                     fontWeight: FontWeight.w400),
               ),
@@ -84,14 +60,14 @@ class _SettingScreenState extends State<SettingScreen> {
                   Text(
                     'Bạn có chắc chắn muốn kích',
                     style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 18,
                         color: Colors.white,
                         fontWeight: FontWeight.w400),
                   ),
                   Text(
                     'hoạt tính năng này',
                     style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 18,
                         color: Colors.white,
                         fontWeight: FontWeight.w400),
                   )
@@ -99,41 +75,52 @@ class _SettingScreenState extends State<SettingScreen> {
               ),
             ),
             actions: [
-              Container(
-                width: screenWidth * 0.3,
-                height: screenHeight * 0.05,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style:
-                      ElevatedButton.styleFrom(backgroundColor: Colors.white),
-                  child: Center(
-                    child: Text(
-                      'Hủy',
-                      style: TextStyle(
-                          fontSize: 22,
-                          color: Color.fromARGB(255, 255, 80, 80),
-                          fontWeight: FontWeight.w600),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    width: screenWidth * 0.3,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 255, 80, 80),
+                          side: BorderSide(
+                            color: Colors.white,
+                          )),
+                      child: Center(
+                        child: Text(
+                          'Hủy',
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-              Container(
-                width: screenWidth * 0.3,
-                height: screenHeight * 0.05,
-                child: ElevatedButton(
-                  onPressed: () => activateBiometrics,
-                  style:
-                      ElevatedButton.styleFrom(backgroundColor: Colors.white),
-                  child: Center(
-                    child: Text(
-                      'Đồng ý',
-                      style: TextStyle(
-                          fontSize: 22,
-                          color: Color.fromARGB(255, 255, 80, 80),
-                          fontWeight: FontWeight.w600),
+                  Container(
+                    width: screenWidth * 0.3,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        activateBiometrics();
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white),
+                      child: Center(
+                        child: Text(
+                          'Đồng ý',
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: Color.fromARGB(255, 255, 80, 80),
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               )
             ],
           );
@@ -143,8 +130,10 @@ class _SettingScreenState extends State<SettingScreen> {
   void activateBiometrics() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.setBool('biometricsActivated', true);
-    isTurnOnBiometric = true;
-    setState(() {});
+
+    setState(() {
+      isTurnOnBiometric = true;
+    });
   }
 
   void disableBiometrics() async {
@@ -164,6 +153,32 @@ class _SettingScreenState extends State<SettingScreen> {
     }
   }
 
+  void activateNotification() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.setBool('notificationsActivated', true);
+
+    setState(() {
+      isTurnOnNotification = true;
+    });
+  }
+
+  void disableNotification() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.remove('notificationsActivated');
+    isTurnOnNotification = false;
+    setState(() {});
+  }
+
+  void setNotificationTurnOnState() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    bool? notificationTurnOn = await preferences.getBool('notificationsActivated');
+    if (notificationTurnOn != null) {
+      setState(() {
+        isTurnOnBiometric = notificationTurnOn;
+      });
+    }
+  }
+
   void handleLogout() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('id');
@@ -174,11 +189,13 @@ class _SettingScreenState extends State<SettingScreen> {
     await prefs.remove('role');
     await prefs.remove('province');
     await prefs.remove('imageUrl');
+    await prefs.remove('isRemembered');
   }
 
   @override
   void initState() {
     super.initState();
+    setNotificationTurnOnState();
     setBiometricsTurnOnState();
   }
 
@@ -199,7 +216,7 @@ class _SettingScreenState extends State<SettingScreen> {
             debugPrint('BROO');
             Navigator.push(
                 context,
-                changePage(AccountInfoScreen(
+                ChangePage.changePage(AccountInfoScreen(
                     fullName: currentState.fullName,
                     email: currentState.email,
                     phoneNumber: currentState.phoneNumber,
@@ -207,7 +224,7 @@ class _SettingScreenState extends State<SettingScreen> {
           case NavigateToUpdateAccountState:
             Navigator.push(
                 context,
-                changePage(UpdateAccountScreen(
+                ChangePage.changePage(UpdateAccountScreen(
                   id: widget.id,
                   fullName: widget.fullName,
                   email: widget.email,
@@ -325,9 +342,11 @@ class _SettingScreenState extends State<SettingScreen> {
                                       Color.fromARGB(255, 16, 210, 22),
                                   value: isTurnOnNotification,
                                   onChanged: (newValue) {
-                                    setState(() {
-                                      isTurnOnNotification = newValue;
-                                    });
+                                    if (!isTurnOnNotification) {
+                                      activateNotification();
+                                    } else {
+                                      disableNotification();
+                                    }
                                   })
                               : CupertinoSwitch(
                                   trackColor: Color.fromARGB(255, 16, 210, 22),

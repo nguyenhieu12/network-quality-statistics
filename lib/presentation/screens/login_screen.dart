@@ -7,6 +7,7 @@ import 'package:network_quality_statistic/logic/blocs/login/login_bloc.dart';
 import 'package:network_quality_statistic/presentation/screens/landing_screen.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:network_quality_statistic/presentation/screens/reset_options_screen.dart';
+import 'package:network_quality_statistic/utils/change_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -68,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void checkRemembered() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
 
-    bool? isRemembered = preferences.getBool('isRembered');
+    bool? isRemembered = preferences.getBool('isRemembered');
 
     if (isRemembered != null) {
       String? email = preferences.getString('email');
@@ -154,39 +155,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ],
           );
         }));
-  }
-
-  PageRouteBuilder changePage(Widget page) {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => page,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(1.0, 0.0);
-        const end = Offset.zero;
-        const curve = Curves.easeInOut;
-        const duration = Duration(seconds: 2);
-
-        var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-        var offsetAnimation = tween.animate(
-          CurvedAnimation(
-            parent: animation,
-            curve: Interval(0, 1, curve: curve),
-          ),
-        );
-
-        return AnimatedBuilder(
-          animation: animation,
-          builder: (context, child) {
-            return SlideTransition(
-              position: offsetAnimation,
-              child: child,
-            );
-          },
-          child: child,
-        );
-      },
-    );
   }
 
   @override
@@ -335,49 +303,57 @@ class _LoginScreenState extends State<LoginScreen> {
                             });
                           },
                           child: Row(children: [
-                            Checkbox(
-                              value: isRememberSelected,
-                              onChanged: (bool? newValue) async {
-                                isRememberSelected = newValue!;
-                                if (isRememberSelected) {
-                                  SharedPreferences sharedPreferences =
-                                      await SharedPreferences.getInstance();
-                                  sharedPreferences.setBool(
-                                      'isRemembered', isRememberSelected);
-                                } else {
-                                  SharedPreferences sharedPreferences =
-                                      await SharedPreferences.getInstance();
-                                  sharedPreferences.remove('isRemembered');
-                                }
-                                setState(() {});
-                              },
-                              side: MaterialStateBorderSide.resolveWith(
-                                  (states) => BorderSide(
-                                      color: Colors.white, width: 1.0)),
-                              activeColor:
-                                  const Color.fromARGB(255, 255, 102, 102),
-                              checkColor: Colors.white,
-                            ),
-                            SizedBox(height: screenHeight * 0.08),
-                            Text(
-                              'Ghi nhớ đăng nhập',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.normal),
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: isRememberSelected,
+                                  onChanged: (bool? newValue) async {
+                                    isRememberSelected = newValue!;
+                                    if (isRememberSelected) {
+                                      SharedPreferences sharedPreferences =
+                                          await SharedPreferences.getInstance();
+                                      sharedPreferences.setBool(
+                                          'isRemembered', isRememberSelected);
+                                    } else {
+                                      SharedPreferences sharedPreferences =
+                                          await SharedPreferences.getInstance();
+                                      sharedPreferences.remove('isRemembered');
+                                    }
+                                    setState(() {});
+                                  },
+                                  side: MaterialStateBorderSide.resolveWith(
+                                      (states) => BorderSide(
+                                          color: Colors.white, width: 1.0)),
+                                  activeColor:
+                                      const Color.fromARGB(255, 255, 102, 102),
+                                  checkColor: Colors.white,
+                                ),
+                                SizedBox(height: screenHeight * 0.08),
+                                Text(
+                                  'Ghi nhớ đăng nhập',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.normal),
+                                ),
+                              ],
                             ),
                             Spacer(),
                             TextButton(
                               onPressed: () {
                                 Navigator.push(
-                                    context, changePage(ResetOptionsScreen()));
+                                    context, ChangePage.changePage(ResetOptionsScreen()));
                               },
                               child: Text(
                                 'Quên mật khẩu?',
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 17,
-                                    fontWeight: FontWeight.normal),
+                                    fontWeight: FontWeight.normal,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: Colors.white,
+                                    decorationThickness: 0.8
+                                    ),
                               ),
                             )
                           ]),

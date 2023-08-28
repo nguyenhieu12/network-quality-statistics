@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:network_quality_statistic/presentation/screens/otp_verification_screen.dart';
+import 'package:network_quality_statistic/utils/change_page.dart';
 
 class SMSVerificationScreen extends StatefulWidget {
   const SMSVerificationScreen({super.key});
@@ -8,7 +10,9 @@ class SMSVerificationScreen extends StatefulWidget {
 }
 
 class _SMSVerificationScreenState extends State<SMSVerificationScreen> {
-  TextEditingController emailController = TextEditingController();
+  TextEditingController smsController = TextEditingController();
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +31,7 @@ class _SMSVerificationScreenState extends State<SMSVerificationScreen> {
               children: [
                 IconButton(
                   onPressed: () {
+                    FocusScope.of(context).unfocus();
                     Navigator.pop(context);
                   },
                   icon: Icon(
@@ -47,12 +52,12 @@ class _SMSVerificationScreenState extends State<SMSVerificationScreen> {
             ),
             SizedBox(height: screenHeight * 0.03),
             Icon(
-              Icons.mark_email_read_outlined,
+              Icons.sms,
               color: Colors.white,
               size: screenHeight * 0.15,
             ),
             SizedBox(
-              height: screenHeight * 0.05,
+              height: screenHeight * 0.03,
             ),
             Text(
               'Nhập số điện thoại khôi phục mật khẩu',
@@ -62,41 +67,65 @@ class _SMSVerificationScreenState extends State<SMSVerificationScreen> {
                   fontStyle: FontStyle.italic),
             ),
             SizedBox(
-              height: screenHeight * 0.05,
+              height: screenHeight * 0.04,
             ),
-            SizedBox(
+            Container(
               width: screenWidth * 0.9,
               height: screenHeight * 0.07,
-              child: TextFormField(
-                style: TextStyle(color: Colors.white, fontSize: 22),
-                controller: emailController,
-                decoration: InputDecoration(
-                    isDense: true,
-                    labelText: 'Email',
-                    labelStyle: const TextStyle(
-                      fontSize: 20,
-                      color: Color.fromARGB(220, 255, 255, 255),
+              decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.white,
+                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(20))),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(width: 10),
+                  SizedBox(
+                    width: 50,
+                    child: TextField(
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "+84",
+                          hintStyle:
+                              TextStyle(color: Colors.white, fontSize: 22),
+                          isDense: true),
                     ),
-                    prefixIcon: Icon(
-                      Icons.email_outlined,
-                      size: 26,
+                  ),
+                  Container(
+                    height: screenHeight * 0.06,
+                    child: VerticalDivider(
                       color: Colors.white,
+                      width: 1.5,
                     ),
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide:
-                            BorderSide(color: Colors.white, width: 1.0)),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide:
-                            BorderSide(color: Colors.white, width: 1.0)),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 20.0)),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: TextFormField(
+                      controller: smsController,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w500),
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(vertical: 20.0)),
+                      cursorColor: Colors.white,
+                    ),
+                  )
+                ],
               ),
             ),
-            SizedBox(height: screenHeight * 0.02),
+            SizedBox(height: screenHeight * 0.04),
             ElevatedButton(
               onPressed: () {
                 FocusScope.of(context).unfocus();
+                Navigator.push(context, ChangePage.changePage(OTPVerificationScreen()));
+                // handleSendOTP();
               },
               child: Text(
                 'Gửi mã OTP',

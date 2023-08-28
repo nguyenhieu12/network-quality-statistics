@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:network_quality_statistic/presentation/screens/otp_verification_screen.dart';
+import 'package:network_quality_statistic/utils/change_page.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({super.key});
@@ -10,6 +12,10 @@ class EmailVerificationScreen extends StatefulWidget {
 
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   TextEditingController emailController = TextEditingController();
+
+  void handleSendOTP() async {
+    
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +103,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             SizedBox(height: screenHeight * 0.02),
             ElevatedButton(
               onPressed: () {
+                handleSendOTP();
                 FocusScope.of(context).unfocus();
+                Navigator.push(
+                    context, ChangePage.changePage(OTPVerificationScreen()));
               },
               child: Text(
                 'Gửi mã OTP',
