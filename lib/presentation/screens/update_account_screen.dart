@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:network_quality_statistic/data/repositories/user_repository.dart';
@@ -36,7 +34,7 @@ class _UpdateAccountScreenState extends State<UpdateAccountScreen> {
 
     String newImagePath = pickedImage.path;
 
-    await UserRepository.updateUser(widget.id, newImagePath, '0123456789');
+    await UserRepository.updateUserByID(widget.id, newImagePath, '0123456789');
 
     setState(() {
       newImageUrl = newImagePath;

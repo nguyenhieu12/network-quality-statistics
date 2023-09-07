@@ -113,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 'Thông báo',
                 style: TextStyle(
                     fontSize: 30,
-                    color: Color.fromARGB(255, 255, 43, 43),
+                    color: Colors.black,
                     fontWeight: FontWeight.w400),
               ),
             ),
@@ -122,10 +122,10 @@ class _LoginScreenState extends State<LoginScreen> {
               width: width,
               child: Center(
                 child: Text(
-                  'Tính năng này chưa được kích hoạt. Hãy đăng nhập và kích hoạt trong phần cài đặt',
+                  'Tính năng này chưa được kích hoạt. Hãy đăng nhập và kích hoạt trong phần Cài đặt',
                   style: TextStyle(
                       fontSize: 20,
-                      color: Color.fromARGB(255, 255, 43, 43),
+                      color: Colors.black,
                       fontWeight: FontWeight.w400),
                   textAlign: TextAlign.justify,
                 ),
@@ -181,13 +181,13 @@ class _LoginScreenState extends State<LoginScreen> {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Center(
                 child: Text(
-              'Đăng nhập thất bại, vui lòng thử lại',
+              state.message,
               style: TextStyle(
                   fontSize: 18,
                   color: const Color.fromARGB(255, 255, 102, 102),
                   fontWeight: FontWeight.w500),
             )),
-            duration: const Duration(seconds: 1),
+            duration: const Duration(seconds: 2),
             backgroundColor: Colors.white,
           ));
         }
@@ -342,7 +342,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             TextButton(
                               onPressed: () {
                                 Navigator.push(
-                                    context, ChangePage.changePage(ResetOptionsScreen()));
+                                    context,
+                                    ChangePage.changePage(
+                                        ResetOptionsScreen()));
                               },
                               child: Text(
                                 'Quên mật khẩu?',
@@ -352,8 +354,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     fontWeight: FontWeight.normal,
                                     decoration: TextDecoration.underline,
                                     decorationColor: Colors.white,
-                                    decorationThickness: 0.8
-                                    ),
+                                    decorationThickness: 0.8),
                               ),
                             )
                           ]),
@@ -363,8 +364,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ElevatedButton(
                         onPressed: () {
                           loginBloc.add(LoginButtonClickedEvent(
-                              email: 'toanquoc@gmail.com',
-                              password: 'toanquoc'));
+                              email: emailController.text,
+                              password: passwordController.text));
                           FocusScope.of(context).unfocus();
                         },
                         child: Text(

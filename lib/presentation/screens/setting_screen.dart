@@ -32,6 +32,7 @@ class SettingScreen extends StatefulWidget {
 class _SettingScreenState extends State<SettingScreen> {
   bool isTurnOnNotification = false;
   bool isTurnOnBiometric = false;
+  bool isObscure = false;
   final SettingBloc settingBloc = SettingBloc();
 
   void showBiometricsAlert(double screenWidth, double screenHeight) {
@@ -42,13 +43,13 @@ class _SettingScreenState extends State<SettingScreen> {
           double width = MediaQuery.of(context).size.width;
 
           return AlertDialog(
-            backgroundColor: Color.fromARGB(255, 255, 80, 80),
+            backgroundColor: Colors.white,
             title: Center(
               child: const Text(
                 'Đăng nhập bằng vân tay',
                 style: TextStyle(
                     fontSize: 24,
-                    color: Colors.white,
+                    color: Colors.black,
                     fontWeight: FontWeight.w400),
               ),
             ),
@@ -61,14 +62,14 @@ class _SettingScreenState extends State<SettingScreen> {
                     'Bạn có chắc chắn muốn kích',
                     style: TextStyle(
                         fontSize: 18,
-                        color: Colors.white,
+                        color: Colors.black,
                         fontWeight: FontWeight.w400),
                   ),
                   Text(
                     'hoạt tính năng này',
                     style: TextStyle(
                         fontSize: 18,
-                        color: Colors.white,
+                        color: Colors.black,
                         fontWeight: FontWeight.w400),
                   )
                 ],
@@ -84,16 +85,16 @@ class _SettingScreenState extends State<SettingScreen> {
                     child: ElevatedButton(
                       onPressed: () => Navigator.pop(context),
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Color.fromARGB(255, 255, 80, 80),
+                          backgroundColor: Colors.white,
                           side: BorderSide(
-                            color: Colors.white,
+                            color: Color.fromARGB(255, 255, 80, 80),
                           )),
                       child: Center(
                         child: Text(
                           'Hủy',
                           style: TextStyle(
                               fontSize: 20,
-                              color: Colors.white,
+                              color: Color.fromARGB(255, 255, 80, 80),
                               fontWeight: FontWeight.w600),
                         ),
                       ),
@@ -104,17 +105,117 @@ class _SettingScreenState extends State<SettingScreen> {
                     height: screenHeight * 0.05,
                     child: ElevatedButton(
                       onPressed: () {
-                        activateBiometrics();
                         Navigator.pop(context);
+                        showPasswordRequired(screenWidth, screenHeight);
                       },
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white),
+                          backgroundColor: Color.fromARGB(255, 255, 80, 80)),
                       child: Center(
                         child: Text(
                           'Đồng ý',
                           style: TextStyle(
                               fontSize: 20,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          );
+        }));
+  }
+
+  void showPasswordRequired(double screenWidth, double screenHeight) {
+    TextEditingController passwordController = TextEditingController();
+
+    showDialog(
+        context: context,
+        builder: ((BuildContext context) {
+          double height = MediaQuery.of(context).size.height;
+          double width = MediaQuery.of(context).size.width;
+
+          return AlertDialog(
+            backgroundColor: Colors.white,
+            title: Center(
+              child: const Text(
+                'Nhập mật khẩu',
+                style: TextStyle(
+                    fontSize: 24,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w400),
+              ),
+            ),
+            content: TextFormField(
+              obscureText: !isObscure,
+              controller: passwordController,
+              decoration: InputDecoration(
+                hintText: 'Mật khẩu',
+              ),
+            ),
+            actions: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    width: screenWidth * 0.25,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          side: BorderSide(
+                            color: Color.fromARGB(255, 255, 80, 80),
+                          )),
+                      child: Center(
+                        child: Text(
+                          'Hủy',
+                          style: TextStyle(
+                              fontSize: 16,
                               color: Color.fromARGB(255, 255, 80, 80),
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: screenWidth * 0.25,
+                    height: screenHeight * 0.05,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        if (prefs.getString('password') ==
+                            passwordController.text) {
+                          FocusScope.of(context).unfocus();
+                          activateBiometrics();
+                          Navigator.pop(context);
+                        } else {
+                          FocusScope.of(context).unfocus();
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Center(
+                                child: Text(
+                              'Mật khẩu không đúng',
+                              style: TextStyle(
+                                  fontSize: 22,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500),
+                            )),
+                            duration: const Duration(seconds: 2),
+                            backgroundColor: Colors.red,
+                          ));
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 255, 80, 80)),
+                      child: Center(
+                        child: Text(
+                          'Đồng ý',
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
                               fontWeight: FontWeight.w600),
                         ),
                       ),
@@ -171,7 +272,8 @@ class _SettingScreenState extends State<SettingScreen> {
 
   void setNotificationTurnOnState() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    bool? notificationTurnOn = await preferences.getBool('notificationsActivated');
+    bool? notificationTurnOn =
+        await preferences.getBool('notificationsActivated');
     if (notificationTurnOn != null) {
       setState(() {
         isTurnOnBiometric = notificationTurnOn;
@@ -213,7 +315,6 @@ class _SettingScreenState extends State<SettingScreen> {
           case NavigateToAccountInfoState:
             NavigateToAccountInfoState currentState =
                 state as NavigateToAccountInfoState;
-            debugPrint('BROO');
             Navigator.push(
                 context,
                 ChangePage.changePage(AccountInfoScreen(
@@ -242,6 +343,7 @@ class _SettingScreenState extends State<SettingScreen> {
         return WillPopScope(
           onWillPop: () async => false,
           child: Scaffold(
+            resizeToAvoidBottomInset: false,
             body: Container(
               color: Colors.white,
               child: Padding(

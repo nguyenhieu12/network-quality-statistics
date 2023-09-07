@@ -19,7 +19,7 @@ class DatabaseHepler {
   static Future<Database> db() async {
     return openDatabase(
       'network_statistic.db',
-      version: 1,
+      version: 6,
       onCreate: (Database db, int version) async {
         await createUserTable(db);
       },

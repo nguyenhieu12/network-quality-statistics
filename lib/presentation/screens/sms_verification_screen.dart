@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:network_quality_statistic/presentation/screens/otp_verification_screen.dart';
 import 'package:network_quality_statistic/utils/change_page.dart';
@@ -12,7 +13,24 @@ class SMSVerificationScreen extends StatefulWidget {
 class _SMSVerificationScreenState extends State<SMSVerificationScreen> {
   TextEditingController smsController = TextEditingController();
 
-  
+  String codeSent = '';
+
+  void handleSendOTP(String phone) async {
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber: '+84${phone}',
+      verificationCompleted: (PhoneAuthCredential credential) {},
+      verificationFailed: (FirebaseAuthException e) {},
+      codeSent: (String verificationId, int? resendToken) {
+        debugPrint('OTP: ${verificationId}');
+        Navigator.push(
+            context,
+            ChangePage.changePage(
+                OTPVerificationScreen(verifyID: verificationId)));
+        // codeSent = verificationId;
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {},
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,35 +38,35 @@ class _SMSVerificationScreenState extends State<SMSVerificationScreen> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 255, 102, 102),
+          centerTitle: true,
+          title: Text(
+            'Xác thực qua SMS',
+            style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+                fontSize: 32,
+                decoration: TextDecoration.none),
+          ),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+                FocusScope.of(context).unfocus();
+              },
+              icon: Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+                size: 36,
+              ))),
       resizeToAvoidBottomInset: false,
       body: Container(
         color: const Color.fromARGB(255, 255, 102, 102),
         child: Column(
           children: [
-            SizedBox(height: screenHeight * 0.1),
+            SizedBox(height: screenHeight * 0.05),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    FocusScope.of(context).unfocus();
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                    size: 40,
-                  ),
-                ),
-                Text(
-                  'Xác thực qua SMS',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 32,
-                      decoration: TextDecoration.none),
-                )
-              ],
+              children: [],
             ),
             SizedBox(height: screenHeight * 0.03),
             Icon(
@@ -113,7 +131,7 @@ class _SMSVerificationScreenState extends State<SMSVerificationScreen> {
                       keyboardType: TextInputType.phone,
                       decoration: InputDecoration(
                           border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(vertical: 20.0)),
+                          contentPadding: EdgeInsets.symmetric(vertical: 22.0)),
                       cursorColor: Colors.white,
                     ),
                   )
@@ -124,8 +142,7 @@ class _SMSVerificationScreenState extends State<SMSVerificationScreen> {
             ElevatedButton(
               onPressed: () {
                 FocusScope.of(context).unfocus();
-                Navigator.push(context, ChangePage.changePage(OTPVerificationScreen()));
-                // handleSendOTP();
+                handleSendOTP(smsController.text);
               },
               child: Text(
                 'Gửi mã OTP',

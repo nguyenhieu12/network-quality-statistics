@@ -1,8 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:network_quality_statistic/presentation/screens/reset_password_screen.dart';
+import 'package:network_quality_statistic/utils/change_page.dart';
 
 class OTPVerificationScreen extends StatefulWidget {
-  const OTPVerificationScreen({Key? key}) : super(key: key);
+  String verifyID;
+
+  OTPVerificationScreen({required this.verifyID});
+
+  // const OTPVerificationScreen({Key? key}) : super(key: key);
 
   @override
   State<OTPVerificationScreen> createState() => _OTPVerificationScreenState();
@@ -18,6 +25,12 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     6,
     (index) => TextEditingController(),
   );
+
+  @override
+  void initState() {
+    super.initState();
+    debugPrint('OTP: ${widget.verifyID}');
+  }
 
   @override
   void dispose() {
@@ -36,9 +49,16 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     }
   }
 
-  void _verifyOTP() {
-    final otp = controllers.map((controller) => controller.text).join();
-    print('Mã OTP: $otp');
+  void _verifyOTP() async {
+    try {
+      final otp = controllers.map((controller) => controller.text).join();
+    PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: widget.verifyID, smsCode: otp);
+
+    await FirebaseAuth.instance.signInWithCredential(credential);
+    Navigator.push(context, ChangePage.changePage(ResetPasswordScreen()));
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   @override

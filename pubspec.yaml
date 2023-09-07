@@ -26,10 +26,28 @@ dependencies:
   local_auth: ^2.1.6
   firebase_core: ^2.15.1
   firebase_auth: ^4.8.0
+  flutter_native_splash: ^2.2.16
+  firebase_messaging: ^14.6.7
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.11.0"
+
+flutter_native_splash:
+  android: true
+  ios: true
+  color: "#FF6666"
+  image: "assets/images/splash.png"
+  android_12:
+    color: "#FF6666"
+    image: "assets/images/splash.png"
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/app_icon.png"
+  min_sdk_android: 21
 
 flutter:
 

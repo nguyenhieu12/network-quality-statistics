@@ -19,17 +19,15 @@ class _LineScreenState extends State<LineScreen> {
   TextEditingController searchController = TextEditingController();
   List<String> suggestions = [
     'Quốc lộ 1, Hoàng Mai',
-    'Đường Xuân Thủy, Cầu Giấy',
     'Quốc lộ 1, Thanh Trì',
-    'Đường Võ Chí Công, Tây Hồ',
     'Quốc lộ 1, Phú Xuyên',
     'Quốc lộ 1, Thường Tín'
   ];
   List<String> filteredSuggestions = [];
-  late List<dynamic> jsonData = [];
-  late Map<String, dynamic> lowKqiGeoJson;
-  late Map<String, dynamic> mediumKqiGeoJson;
-  late Map<String, dynamic> highKqiGeoJson;
+  List<dynamic> jsonData = [];
+  Map<String, dynamic> lowKqiGeoJson = {};
+  Map<String, dynamic> mediumKqiGeoJson = {};
+  Map<String, dynamic> highKqiGeoJson = {};
   late Map<String, dynamic> featuresMap;
   List<Map<String, dynamic>> lowData = [];
   List<Map<String, dynamic>> mediumData = [];
@@ -42,6 +40,8 @@ class _LineScreenState extends State<LineScreen> {
   void _onMapCreated(MapboxMapController controller) {
     mapController = controller;
 
+    removeAllCircleLayers();
+
     mapController.onFeatureTapped.add((id, point, coordinates) {
       handleProvinceTapped(id);
     });
@@ -52,103 +52,94 @@ class _LineScreenState extends State<LineScreen> {
       context: context,
       builder: ((context) {
         return Container(
-          height: 250,
+          height: 260,
           width: double.infinity,
           decoration: BoxDecoration(
               color: Colors.white, borderRadius: BorderRadius.circular(20)),
           child: Stack(
             children: [
-              Padding(
-                padding: EdgeInsets.only(top: 20, left: 10),
-                child: IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(
-                      Icons.clear,
-                      size: 30,
-                      color: Colors.black,
-                    )),
-              ),
+              IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(
+                    Icons.clear,
+                    size: 32,
+                    color: Colors.black,
+                  )),
               Center(
-                child: Padding(
-                  padding: EdgeInsets.only(top: 10),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: 10),
-                          child: Text(
-                            'Thông tin tỉnh/thành phố',
-                            style: TextStyle(fontSize: 24),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 60, right: 60),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Tỉnh/thành phố:',
-                                style: const TextStyle(fontSize: 18),
-                              ),
-                              Text(
-                                '${featuresMap[id]['district']}',
-                                style: const TextStyle(fontSize: 18),
-                              )
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 60, right: 60),
-                          child: Container(
-                            child: Divider(
-                              thickness: 0.8,
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        'Thông tin tỉnh/thành phố',
+                        style: TextStyle(fontSize: 24),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 60, right: 60),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Tỉnh/thành phố:',
+                              style: const TextStyle(fontSize: 18),
                             ),
+                            Text(
+                              '${featuresMap[id]['district']}',
+                              style: const TextStyle(fontSize: 18),
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 60, right: 60),
+                        child: Container(
+                          child: Divider(
+                            thickness: 0.8,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 60, right: 60),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Giá trị:',
-                                style: const TextStyle(fontSize: 18),
-                              ),
-                              Text(
-                                '${featuresMap[id]['kqi']}',
-                                style: const TextStyle(fontSize: 18),
-                              )
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 60, right: 60),
-                          child: Container(
-                            child: Divider(
-                              thickness: 0.8,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 60, right: 60),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Giá trị:',
+                              style: const TextStyle(fontSize: 18),
                             ),
+                            Text(
+                              '${featuresMap[id]['kqi']}',
+                              style: const TextStyle(fontSize: 18),
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 60, right: 60),
+                        child: Container(
+                          child: Divider(
+                            thickness: 0.8,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 60, right: 60),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Chất lượng:',
-                                style: const TextStyle(fontSize: 18),
-                              ),
-                              Text(
-                                '${(featuresMap[id]['kqi'] < lowThreshold ? 'Tồi' : (featuresMap[id]['kqi'] > highThreshold ? 'Tốt' : 'Trung bình'))}',
-                                style: const TextStyle(fontSize: 18),
-                              )
-                            ],
-                          ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 60, right: 60),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Chất lượng:',
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                            Text(
+                              '${(featuresMap[id]['kqi'] < lowThreshold ? 'Tồi' : (featuresMap[id]['kqi'] > highThreshold ? 'Tốt' : 'Trung bình'))}',
+                              style: const TextStyle(fontSize: 18),
+                            )
+                          ],
                         ),
-                      ]),
-                ),
+                      ),
+                    ]),
               ),
             ],
           ),
@@ -162,7 +153,8 @@ class _LineScreenState extends State<LineScreen> {
 
   Future<void> loadJSONData() async {
     try {
-      String jsonString = await rootBundle.loadString('assets/data/line_data.json');
+      String jsonString =
+          await rootBundle.loadString('assets/data/line_data.json');
       jsonData = json.decode(jsonString);
       for (int i = 0; i < jsonData.length; i++) {
         jsonData[i]['id'] = uuid.v4();
@@ -244,20 +236,21 @@ class _LineScreenState extends State<LineScreen> {
   }
 
   Future<void> removeAllCircleLayers() async {
-    if (lowData.isNotEmpty || mediumData.isNotEmpty || highData.isNotEmpty) {
-      lowData.clear();
-      mediumData.clear();
-      highData.clear();
-      lowKqiGeoJson.clear();
-      mediumKqiGeoJson.clear();
-      highKqiGeoJson.clear();
-      await mapController.removeLayer('lowLayer');
-      await mapController.removeLayer('mediumLayer');
-      await mapController.removeLayer('highLayer');
-      await mapController.removeSource('lowKqiGeoJson');
-      await mapController.removeSource('mediumKqiGeoJson');
-      await mapController.removeSource('highKqiGeoJson');
-    }
+    lowData.clear();
+    mediumData.clear();
+    highData.clear();
+    lowKqiGeoJson.clear();
+    mediumKqiGeoJson.clear();
+    highKqiGeoJson.clear();
+
+    await mapController.removeLayer('lowLayer');
+    await mapController.removeSource('lowKqiGeoJson');
+
+    await mapController.removeLayer('mediumLayer');
+    await mapController.removeSource('mediumKqiGeoJson');
+
+    await mapController.removeLayer('highLayer');
+    await mapController.removeSource('highKqiGeoJson');
   }
 
   void handleTextInputFinished() async {
@@ -265,15 +258,6 @@ class _LineScreenState extends State<LineScreen> {
     await removeAllCircleLayers();
     await loadGeoJson(searchController.text);
     await addAllCircleLayers();
-    // await mapController
-    //     .moveCamera(CameraUpdate.newLatLngZoom(currentLatlng, 12.0));
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    removeAllCircleLayers();
-    loadJSONData();
   }
 
   @override
@@ -300,7 +284,7 @@ class _LineScreenState extends State<LineScreen> {
                       if (textEditingValue.text == '') {
                         return const Iterable<String>.empty();
                       }
-    
+
                       return suggestions.where((String suggestion) {
                         return suggestion.toLowerCase().contains(
                               textEditingValue.text.toLowerCase(),
@@ -313,9 +297,6 @@ class _LineScreenState extends State<LineScreen> {
                       await removeAllCircleLayers();
                       await loadGeoJson(searchController.text);
                       await addAllCircleLayers();
-                      // await mapController.moveCamera(
-                      //     CameraUpdate.newLatLngZoom(currentLatlng, 12.0));
-                      // setState(() {});
                     },
                     fieldViewBuilder: (BuildContext context,
                         TextEditingController fieldTextEditingController,
@@ -346,6 +327,17 @@ class _LineScreenState extends State<LineScreen> {
                             size: 26,
                             color: Colors.black,
                           ),
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              searchController.clear();
+                              fieldTextEditingController.clear();
+                            },
+                            icon: Icon(
+                              Icons.clear_rounded,
+                              size: 26,
+                              color: Colors.black,
+                            ),
+                          ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(20),
                             borderSide:
@@ -364,13 +356,17 @@ class _LineScreenState extends State<LineScreen> {
                           isDense: true,
                           alignLabelWithHint: true,
                         ),
+                        onChanged: (value) {
+                          searchController.text = value;
+                        },
                         onTap: () {
-                          fieldTextEditingController.text = searchController.text;
+                          fieldTextEditingController.text =
+                              searchController.text;
                           fieldTextEditingController.selection =
                               TextSelection.fromPosition(TextPosition(
                                   offset:
                                       fieldTextEditingController.text.length));
-    
+
                           fieldTextEditingController.addListener(() {
                             final searchText =
                                 fieldTextEditingController.text.toLowerCase();
@@ -393,22 +389,67 @@ class _LineScreenState extends State<LineScreen> {
                   children: [
                     StatisticWidget(
                         label: 'Tốt',
-                        statistic: highData.isEmpty ? '0' : (highData.length).toString() + '/' + (lowData.length + mediumData.length + highData.length).toString(),
-                        percent: highData.isEmpty ? '0' : ((highData.length) / (lowData.length + mediumData.length + highData.length) * 100.0).toStringAsFixed(2) + '%',
+                        statistic: highData.isEmpty
+                            ? '0'
+                            : (highData.length).toString() +
+                                '/' +
+                                (lowData.length +
+                                        mediumData.length +
+                                        highData.length)
+                                    .toString(),
+                        percent: highData.isEmpty
+                            ? '0'
+                            : ((highData.length) /
+                                        (lowData.length +
+                                            mediumData.length +
+                                            highData.length) *
+                                        100.0)
+                                    .toStringAsFixed(2) +
+                                '%',
                         color: Color.fromARGB(255, 67, 217, 13),
                         screenWidth: screenWidth,
                         screenHeight: screenHeight),
                     StatisticWidget(
                         label: 'Trung bình',
-                        statistic: mediumData.isEmpty ? '0' : (mediumData.length).toString() + '/' + (lowData.length + mediumData.length + highData.length).toString(),
-                        percent: mediumData.isEmpty ? '0' : ((mediumData.length) / (lowData.length + mediumData.length + highData.length) * 100.0).toStringAsFixed(2) + '%',
+                        statistic: mediumData.isEmpty
+                            ? '0'
+                            : (mediumData.length).toString() +
+                                '/' +
+                                (lowData.length +
+                                        mediumData.length +
+                                        highData.length)
+                                    .toString(),
+                        percent: mediumData.isEmpty
+                            ? '0'
+                            : ((mediumData.length) /
+                                        (lowData.length +
+                                            mediumData.length +
+                                            highData.length) *
+                                        100.0)
+                                    .toStringAsFixed(2) +
+                                '%',
                         color: Color.fromARGB(255, 255, 153, 0),
                         screenWidth: screenWidth,
                         screenHeight: screenHeight),
                     StatisticWidget(
                         label: 'Tồi',
-                        statistic: lowData.isEmpty ? '0' : (lowData.length).toString() + '/' + (lowData.length + mediumData.length + highData.length).toString(),
-                        percent: lowData.isEmpty ? '0' : ((lowData.length) / (lowData.length + mediumData.length + highData.length) * 100.0).toStringAsFixed(2) + '%',
+                        statistic: lowData.isEmpty
+                            ? '0'
+                            : (lowData.length).toString() +
+                                '/' +
+                                (lowData.length +
+                                        mediumData.length +
+                                        highData.length)
+                                    .toString(),
+                        percent: lowData.isEmpty
+                            ? '0'
+                            : ((lowData.length) /
+                                        (lowData.length +
+                                            mediumData.length +
+                                            highData.length) *
+                                        100.0)
+                                    .toStringAsFixed(2) +
+                                '%',
                         color: Color.fromARGB(255, 255, 80, 80),
                         screenWidth: screenWidth,
                         screenHeight: screenHeight)

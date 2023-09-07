@@ -5,6 +5,8 @@ import 'package:uuid/uuid.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 
+import '../../utils/map_selection_info.dart';
+
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -14,7 +16,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   late MapboxMapController mapController;
-  late Map<String, dynamic> geoJsonData;
+  Map<String, dynamic> geoJsonData = {};
   Map<String, dynamic> provinceData = {};
   List<Map<String, dynamic>> lowGeoJson = [];
   List<Map<String, dynamic>> mediumGeoJson = [];
@@ -27,16 +29,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Uuid uuid = const Uuid();
   int lowThreshold = 30;
   int highThreshold = 70;
-  late bool isAll;
-  String currentArea = '';
   String currentProvince = '';
   String selectedOption = 'Toàn quốc';
 
   void _onMapCreated(MapboxMapController controller) {
     mapController = controller;
 
-    if (lowGeoJson.isNotEmpty) {
+    if (MapSelectionInfo.isAll) {
       removeAllLayers();
+    } else {
+      removeAreaLayer(MapSelectionInfo.currentArea);
+      MapSelectionInfo.currentArea = '';
     }
 
     initMapAll();
@@ -124,7 +127,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       addLayer(
           'sourceId-high', 'layerId-high', highFeatureCollection, '#6FE844');
 
-      isAll = true;
+      MapSelectionInfo.isAll = true;
 
       setState(() {});
     } catch (e) {
@@ -203,49 +206,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-  // Future<void> initMapProvince(String province) async {
-  //   List<dynamic> features = geoJsonData['features'];
-
-  //   for (int i = 0; i < features.length; i++) {
-  //     if (province == features[i]['properties']['Name_VI']) {
-  //       if (features[i]['kqi'] < lowThreshold) {
-  //         lowGeoJson.add(features[i]);
-  //       } else if (features[i]['kqi'] > highThreshold) {
-  //         highGeoJson.add(features[i]);
-  //       } else {
-  //         mediumGeoJson.add(features[i]);
-  //       }
-  //     }
-  //   }
-
-  //   if (lowGeoJson.isNotEmpty) {
-  //     Map<String, dynamic> lowFeatureCollection = {
-  //       "type": "FeatureCollection",
-  //       "features": lowGeoJson,
-  //     };
-
-  //     addLayer('sourceId-$province', 'layerId-$province', lowFeatureCollection,
-  //         '#FF6666');
-  //   } else if (mediumGeoJson.isNotEmpty) {
-  //     Map<String, dynamic> mediumFeatureCollection = {
-  //       "type": "FeatureCollection",
-  //       "features": mediumGeoJson,
-  //     };
-
-  //     addLayer('sourceId-$province', 'layerId-$province',
-  //         mediumFeatureCollection, '#FF9900');
-  //   } else {
-  //     Map<String, dynamic> highFeatureCollection = {
-  //       "type": "FeatureCollection",
-  //       "features": highGeoJson,
-  //     };
-
-  //     addLayer('sourceId-$province', 'layerId-$province', highFeatureCollection,
-  //         '#E4C623');
-  //   }
-  // }
-
   Future<void> removeAllLayers() async {
+    geoJsonData.clear();
     lowGeoJson.clear();
     mediumGeoJson.clear();
     highGeoJson.clear();
@@ -285,15 +247,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     debugPrint('AREA: $selectedArea DELETED');
   }
 
-  // Future<void> removeProvinceLayer(String province) async {
-  //   lowGeoJson.clear();
-  //   mediumGeoJson.clear();
-  //   highGeoJson.clear();
-
-  //   await mapController.removeLayer('layerId-$province');
-  //   await mapController.removeSource('sourceId-$province');
-  // }
-
   void addLayer(String sourceId, String layerId,
       Map<String, dynamic> geoJsonSource, String color) async {
     await mapController.addGeoJsonSource(sourceId, geoJsonSource);
@@ -308,27 +261,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> handleOptionSelected(String newValue) async {
     if (newValue.contains('Miền')) {
-      if (currentArea == '') {
-        currentArea = newValue;
+      if (MapSelectionInfo.currentArea == '') {
+        MapSelectionInfo.currentArea = newValue;
         selectedOption = newValue;
-        isAll = false;
+        MapSelectionInfo.isAll = false;
         await removeAllLayers();
         await initMapArea(newValue);
         setState(() {});
-      } else if (currentArea == newValue) {
+      } else if (MapSelectionInfo.currentArea == newValue) {
         return;
       } else {
-        await removeAreaLayer(currentArea);
+        await removeAreaLayer(MapSelectionInfo.currentArea);
         await initMapArea(newValue);
-        currentArea = newValue;
+        MapSelectionInfo.currentArea = newValue;
         selectedOption = newValue;
         setState(() {});
       }
     } else if (newValue == 'Toàn quốc') {
-      if (currentArea != '') {
-        await removeAreaLayer(currentArea);
+      if (MapSelectionInfo.currentArea != '') {
+        await removeAreaLayer(MapSelectionInfo.currentArea);
         await initMapAll();
-        currentArea = '';
+        MapSelectionInfo.currentArea = '';
         selectedOption = newValue;
         await mapController.moveCamera(
             CameraUpdate.newLatLngZoom(LatLng(16.102622, 105.690185), 4.6));
@@ -349,14 +302,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Stack(
             children: [
               Padding(
-                padding: EdgeInsets.only(top: 10, left: 10),
+                padding: const EdgeInsets.only(top: 5),
                 child: IconButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },
                     icon: Icon(
                       Icons.clear,
-                      size: 30,
+                      size: 32,
                       color: Colors.black,
                     )),
               ),
@@ -364,12 +317,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      Padding(
-                        padding: EdgeInsets.only(top: 10),
-                        child: Text(
-                          'Thông tin tỉnh/thành phố',
-                          style: TextStyle(fontSize: 24),
-                        ),
+                      Text(
+                        'Thông tin tỉnh/thành phố',
+                        style: TextStyle(fontSize: 26),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 60, right: 60),
@@ -856,13 +806,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               backgroundColor:
                                   Color.fromARGB(255, 255, 80, 80)),
                           onPressed: () async {
-                            if (isAll) {
+                            if (MapSelectionInfo.isAll) {
                               await removeAllLayers();
                               await initMapAll();
                               Navigator.pop(context);
-                            } else if (currentArea != '') {
-                              await removeAreaLayer(currentArea);
-                              await initMapArea(currentArea);
+                            } else if (MapSelectionInfo.currentArea != '') {
+                              await removeAreaLayer(MapSelectionInfo.currentArea);
+                              await initMapArea(MapSelectionInfo.currentArea);
                               Navigator.pop(context);
                             }
                             setState(() {});

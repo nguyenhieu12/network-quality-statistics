@@ -17,45 +17,47 @@ class _ResetOptionsScreenState extends State<ResetOptionsScreen> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 255, 102, 102),
+          centerTitle: true,
+          title: Text(
+            'Lấy lại mật khẩu',
+            style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+                fontSize: 32,
+                decoration: TextDecoration.none),
+          ),
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+              size: 40,
+            ),
+          )),
       body: Container(
         color: const Color.fromARGB(255, 255, 102, 102),
         child: Center(
           child: Padding(
-            padding: EdgeInsets.only(top: screenHeight * 0.15),
+            padding: EdgeInsets.only(top: screenHeight * 0.05),
             child: Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
-                        size: 40,
-                      ),
-                    ),
-                    Text(
-                      'Lấy lại mật khẩu',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 32,
-                          decoration: TextDecoration.none),
-                    )
-                  ],
+                  children: [],
                 ),
                 SizedBox(height: 20),
                 Text(
                   'Chọn phương thức lấy lại mật khẩu',
                   style: TextStyle(
                       color: Colors.white,
-                      fontSize: 22,
+                      fontSize: 23,
                       fontStyle: FontStyle.italic),
                 ),
-                SizedBox(height: screenHeight * 0.05),
+                SizedBox(height: screenHeight * 0.1),
                 GestureDetector(
                   onTap: () => Navigator.push(
                       context, ChangePage.changePage(SMSVerificationScreen())),
@@ -89,8 +91,8 @@ class _ResetOptionsScreenState extends State<ResetOptionsScreen> {
                 ),
                 SizedBox(height: screenHeight * 0.05),
                 GestureDetector(
-                  onTap: () => Navigator.push(
-                      context, ChangePage.changePage(EmailVerificationScreen())),
+                  onTap: () => Navigator.push(context,
+                      ChangePage.changePage(EmailVerificationScreen())),
                   child: Container(
                       width: screenWidth * 0.8,
                       height: screenHeight * 0.2,

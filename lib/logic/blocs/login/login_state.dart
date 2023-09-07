@@ -23,4 +23,8 @@ class LoginSuccessState extends LoginActionState {
       required this.imageUrl});
 }
 
-class ShowLoginFailedState extends LoginActionState {}
+class ShowLoginFailedState extends LoginActionState {
+  String message;
+
+  ShowLoginFailedState({required this.message});
+}

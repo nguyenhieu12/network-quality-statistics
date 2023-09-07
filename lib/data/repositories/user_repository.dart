@@ -43,7 +43,7 @@ class UserRepository {
     return db.query('users');
   }
 
-  static Future updateUser(int id, String newImageUrl, String newPhoneNumber) async {
+  static Future updateUserByID(int id, String newImageUrl, String newPhoneNumber) async {
     final db = await DatabaseHepler.db();
 
     final data = {
@@ -52,6 +52,18 @@ class UserRepository {
     };
 
     await db.update('users', data, where: "id = ?", whereArgs: [id]);
+
+    await db.close();
+  }
+
+  static Future updateUserByEmail(String email, String password) async {
+    final db = await DatabaseHepler.db();
+
+    final data = {
+      'password': password
+    };
+
+    await db.update('users', data, where: "email = ?", whereArgs: [email]);
 
     await db.close();
   }

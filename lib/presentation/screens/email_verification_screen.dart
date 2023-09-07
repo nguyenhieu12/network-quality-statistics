@@ -103,10 +103,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             SizedBox(height: screenHeight * 0.02),
             ElevatedButton(
               onPressed: () {
-                handleSendOTP();
-                FocusScope.of(context).unfocus();
-                Navigator.push(
-                    context, ChangePage.changePage(OTPVerificationScreen()));
+                // handleSendOTP();
+                // FocusScope.of(context).unfocus();
+                // Navigator.push(
+                //     context, ChangePage.changePage(OTPVerificationScreen(verifyID: '')));
               },
               child: Text(
                 'Gửi mã OTP',

@@ -69,7 +69,7 @@ class _LandingScreenState extends State<LandingScreen> {
       listener: (context, state) {},
       builder: (context, state) {
         int currentIndex = 0;
-
+        
         if (state is LineTabSelectedState) {
           currentIndex = 1;
         } else if (state is SettingTabSelectedState) {

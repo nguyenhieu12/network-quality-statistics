@@ -19,7 +19,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     Map<String, dynamic>? loginUser =
         await UserRepository.getUserByEmailAndPassword(
             event.email, event.password);
-    if (loginUser != null) {
+
+    if((event.email == '') || (event.password == '')) {
+      emit(ShowLoginFailedState(message: 'Email và mật khẩu không được trống'));
+    } else if(loginUser == null) {
+      emit(ShowLoginFailedState(message: 'Email hoặc mật khẩu không đúng'));
+    }
+    else {
       emit(LoginLoadingState());
       await Future.delayed(const Duration(seconds: 2));
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -37,11 +43,6 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           email: loginUser['email'],
           phoneNumber: loginUser['phoneNumber'],
           imageUrl: loginUser['imageUrl']));
-      debugPrint('SUCCESS!!!');
-      debugPrint("USER: ${loginUser.toString()}");
-    } else {
-      emit(ShowLoginFailedState());
-      debugPrint('FAILED!!!');
     }
   }
 }

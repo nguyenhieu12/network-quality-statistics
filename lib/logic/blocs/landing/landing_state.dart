@@ -1,22 +1,13 @@
 part of 'landing_bloc.dart';
 
-sealed class LandingState extends Equatable {
-  // final int tabIndex;
+sealed class LandingState {}
 
-  // LandingState({required this.tabIndex});
+sealed class LandingActionState extends LandingState {}
 
-  @override
-  List<Object> get props => [];
-}
-
-sealed class LandingActionState extends LandingState {
-  // LandingActionState({required super.tabIndex});
-}
-
-final class LandingInitial extends LandingState {
-  // LandingInitial({required super.tabIndex});
-}
+final class LandingInitial extends LandingState {}
 
 class LineTabSelectedState extends LandingState {}
+
+class DashboardTabSelectedState extends LandingState {}
 
 class SettingTabSelectedState extends LandingState {}
